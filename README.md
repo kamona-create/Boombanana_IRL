@@ -13,3 +13,8 @@ Mute reads the rule → gestures to Deaf → Deaf tells Blind → Blind acts.
 ## Modules (v1)
 - Cable
 - Switch
+
+## Future Work
+- Custom PCB (v2)
+- DFPlayer Mini for real sound effects
+- Direction + Calculation modules
