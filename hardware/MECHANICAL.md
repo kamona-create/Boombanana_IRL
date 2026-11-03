@@ -117,7 +117,47 @@ and it proves your tolerances are measured, not guessed.
 | Orientation | both shells open-side up, front face on the bed |
 | Print time | ~6–9 h for both shells, ~250 g |
 
-## 8. Assembly order (matters)
+## 8. Internal mounts — yes, every part needs one
+
+Forge requirement, word for word: *"Have a concrete way to attach components
+(including electronics). Use screws, clips, etc. This is a product, not a demo,
+it should feel solid, and not held up by tape, glue, and dreams."*
+
+So: no floating parts. But not every part needs a printed bracket — parts that
+clamp through the panel (jacks, switches, button) are already mounted by their
+own nut. The table below says which is which.
+
+| Part | Mount | Numbers (mm) | Why |
+|---|---|---|---|
+| Screen | 4 bosses + M2.5 screws | boss OD Ø5.0, height 2.5, pilot Ø2.1 | it is the front face — a loose screen kills the product |
+| ESP32 | printed cradle (3 walls) + 1 snap tab | wall 1.6 thick, 3.0 tall, board clearance +0.3 per side, tab 3.0 long x 1.2 thick | DevKit V1 has no trustworthy mounting holes |
+| Perfboard | 4 standoffs + M3 self-tap | standoff OD Ø6.0, height 6.0, pilot Ø2.5 | keeps solder joints off the floor of the case |
+| Banana jack | the part's own nut | hole Ø8.2, washer behind | the hole *is* the mount |
+| Toggle switch | own nut + anti-rotation flat | hole Ø12.2 + 1.5 wide keyway slot | M12 switches spin if you don't key them |
+| Start button | own nut | hole Ø12.2 | same |
+| WS2812B | press-fit + 0.6 mm retention lip | hole Ø5.1, lip on the inside | glue alone pops out with heat |
+| Buzzer | two-piece ring, 2x M2 | ring OD Ø18, ID Ø12.2, ears with Ø2.2 | needs to be serviceable, not glued |
+| Power bank | strap slots for velcro | slot 3.2 x 1.6, **do not** model a tight pocket | power bank sizes vary by ±5 mm |
+| Wiring | 3x cable clips or zip-tie slots | clip gap 0.8 for 22 AWG, slot 3.2 x 1.6 | so pulling a cable never loads a solder joint |
+
+Rules that keep mounts from breaking:
+
+- Any boss touching a wall needs a R1.5 fillet at the base.
+- Minimum 2 perimeters around every screw hole (that is why the boss OD is 7.0
+  for an M3 insert).
+- Snap tabs: 1.2 thick max in PLA, and they only survive ~20 cycles — use them
+  for the ESP32 (rarely removed), not for the case lid.
+- Anything opened more than twice gets a heat-set insert, not a self-tap thread.
+
+## 9. What NOT to do
+
+- ❌ Double-sided tape as the primary attachment (reviewers reject "held by tape").
+- ❌ Glue for anything you might need to replace (buzzer, power bank, screen).
+- ❌ A tight pocket for the power bank — you will change power banks.
+- ❌ Mounts that block the USB port or the BOOT button.
+- ❌ Screwing into a 3 mm wall without a boss.
+
+## 10. Assembly order (matters)
 
 1. Print and check the test plate.
 2. Solder the perfboard and test everything on the bench **before** it goes in.
