@@ -130,6 +130,8 @@ void soundBoom() {
 }
 
 // ================= LEDS =================
+void ledsOff();   // defined below, used by ledsBegin()
+
 void ledsBegin() {
   pinMode(PIN_LAMP_R, OUTPUT);
   pinMode(PIN_LAMP_G, OUTPUT);
