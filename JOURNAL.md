@@ -13,7 +13,7 @@ I played a paper version of the game and it was exciting and wonderful,
 I also wanted to test the game before developing it to see if its really worth it, the paper version was boring because it needed to be with real interactions, so I spend the whole day drawing what the game will look like
 and finally i found the best design for me.
 
-![paper prototype](images/paper-prototype.jpg)
+![paper prototype](photo_2026-11-02_15-18-48.jpg)
 
 **Total time spent: 2h 7m**
 
@@ -22,6 +22,6 @@ Today I researched for the parts and check their prices, I also found a small to
 
 ![wokwi wiring diagram](images/diagram.png)
 
-![BOM with live prices](Boombanana_IRL/photo_2026-11-02_15-18-48.jpg)
+![BOM with live prices](BOM.csv)
 
 **Total time spent: 3h 35m**
