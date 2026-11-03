@@ -6,36 +6,22 @@ created_at: "2026-11-02"
 ---
 
 
-# November 2: Paper prototype and first plan
+# November 2: Paper prototype and first plan:
 
-<!--
-What to write (answer all three):
-- WHAT: you played a paper version of the 3-player game and it worked.
-- WHY: why did you test on paper before buying anything? What did playing it
-  teach you about the rules (timer length, number of rounds, strikes)?
-- PROBLEM: what broke or felt unfair in the paper version, and what did you change?
-Also: which module did you drop for v1, and why?
--->
+November 2: Paper prototype and first plan:
+I played a paper version of the game and it was exciting and wonderful,
+I also wanted to test the game before developing it to see if its really worth it, the paper version was boring because it needed to be with real interactions, so I spend the whole day drawing what the game will look like
+and finally i found the best design for me.
 
 ![paper prototype](images/paper-prototype.jpg)
 
-**Total time spent: 2h 7m hours**
+**Total time spent: 2h 7m**
 
 # November 3: Picking real parts and drawing the pin map
-
-<!--
-What to write:
-- WHAT: researched real parts on ielectrony / dawaer / Amazon.sa and checked live prices.
-- WHY: why ILI9341 without touch? why 8 banana jacks instead of 6? why JST-XH
-  connectors between the modules instead of one big board? why perfboard and not a PCB
-  in v1? why the JS-910B socket (Ø8 mm panel hole)?
-- PROBLEM: the ESP32 pin map conflicts. VSPI needs GPIO18 for SCK and the buzzer was
-  on GPIO18. Write down how you found it and what you moved.
-- Screenshots to include: Wokwi diagram, the BOM spreadsheet, VS Code.
--->
+Today I researched for the parts and check their prices, I also found a small touch screen but, Its complicated for me to program it so i selected a regular TFT 2.4IN screen instead, for me prefboard is better than a PCB so i choose it , I also designed the case for the project and it looked perfectly good. 
 
 ![wokwi wiring diagram](images/diagram.png)
 
-![BOM with live prices](images/bom.png)
+![BOM with live prices](src/BOM.csv)
 
-**Total time spent: 3h 35mhours**
+**Total time spent: 3h 35m**
