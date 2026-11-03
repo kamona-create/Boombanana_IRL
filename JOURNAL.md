@@ -5,15 +5,6 @@ description: "A 3-player physical bomb-defusal game inspired by BOMBANANA! on St
 created_at: "2026-11-02"
 ---
 
-<!--
-HOW TO USE THIS FILE
-- Write every entry yourself, in your own words. Forge reviewers reject
-  AI-written journals. This file only gives you the structure.
-- Every entry needs at least one image: `![what it shows](images/your-file.png)`
-- End every entry with a line exactly like: **Total time spent: 2 hours**
-- Small entries every day beat one huge entry at the end.
-- Explain WHY you made each decision, and write down the mistakes too.
--->
 
 # November 2: Paper prototype and first plan
 
@@ -28,7 +19,7 @@ Also: which module did you drop for v1, and why?
 
 ![paper prototype](images/paper-prototype.jpg)
 
-**Total time spent: X hours**
+**Total time spent: 2h 7m hours**
 
 # November 3: Picking real parts and drawing the pin map
 
@@ -47,4 +38,4 @@ What to write:
 
 ![BOM with live prices](images/bom.png)
 
-**Total time spent: X hours**
+**Total time spent: 3h 35mhours**
