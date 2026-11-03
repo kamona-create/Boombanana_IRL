@@ -14,7 +14,7 @@ and finally i found the best design for me.
 
 ![paper prototype](images/paper-prototype.jpg)
 
-**Total time spent: 2h 7m**
+**Total time spent: 2h 10m**
 
 # November 3: Picking real parts and drawing the pin map
 Today I researched for the parts and check their prices, I also found a small touch screen but, Its complicated for me to program it so i selected a regular TFT 2.4IN screen instead, for me prefboard is better than a PCB so i choose it , I also designed the case for the project and it looked perfectly good. 
@@ -23,4 +23,4 @@ Today I researched for the parts and check their prices, I also found a small to
 
 Parts list with live prices: [BOM.csv](BOM.csv)
 
-**Total time spent: 3h 35m**
+**Total time spent: 5h**
