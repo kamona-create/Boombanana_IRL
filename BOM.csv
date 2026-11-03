@@ -13,10 +13,10 @@ Resistor,220 ohm 1/4W (3 for the RGB + 4 for the green LEDs),7,0.50,0.13,0.93,Pa
 Perfboard,8x12 cm single-sided prototype board 2.54mm pitch,1,9.75,2.60,2.60,Part,https://ielectrony.com/en/product/812cm-universal-pcb-prototype-board-single-sided-2-54mm-hole-pitch/,All wiring lives here
 JST-XH Connector Kit,JST-XH 2/3/4-pin connector set (1180 pcs),1,65.53,17.47,17.47,Part,https://www.amazon.sa/dp/B07CTH46S7,Module connections - a 10-pack would be cheaper
 M3 Screws,M3x8mm screws + nuts assortment kit,1,45.63,12.17,12.17,Part,https://www.amazon.sa/dp/B0DMZNS9MH,Case assembly + board standoffs
-Power Bank,5V USB power bank 5000mAh,1,37.50,10.00,10.00,Part,https://www.amazon.sa/s?k=power+bank+5000mah,Portable power - any local shop works
-USB Cable,USB-A to USB-C cable 1m (matches the ESP32 Type-C port),1,7.50,2.00,2.00,Part,https://www.amazon.sa/s?k=usb+a+to+usb+c+cable+1m,Power and programming
-Hook-up Wire,22AWG stranded wire red + black,1,15.00,4.00,4.00,Part,https://www.amazon.sa/s?k=22awg+stranded+hook+up+wire,Panel wiring and the pullable wires
-3D Printed Case,PLA print of the enclosure 200x140x45mm (2 shells + test plate),1,45.00,12.00,12.00,Service,,Local print shop / FABLAB Jubail (no link)
+Power Bank,5V USB power bank 5000mAh,1,37.50,10.00,10.00,Part,https://www.amazon.sa/s?k=power+bank+5000mah,Price is an estimate - any 5V USB power bank works
+USB Cable,USB-A to USB-C cable 1m (matches the ESP32 Type-C port),1,7.50,2.00,2.00,Part,https://www.amazon.sa/s?k=usb+a+to+usb+c+cable+1m,Price is an estimate - any USB-A to USB-C cable works
+Hook-up Wire,22AWG stranded wire red + black,1,15.00,4.00,4.00,Part,https://www.amazon.sa/s?k=22awg+stranded+hook+up+wire,Price is an estimate - any 22AWG stranded wire works
+3D Printed Case,PLA print of the enclosure 200x140x45mm (2 shells + test plate),1,45.00,12.00,12.00,Service,,Local print shop / FABLAB Jubail - quote, no link
 Breadboard,830-point breadboard,1,38.00,10.13,10.13,Tool,https://www.amazon.sa/dp/B07MX3LC5R,Prototyping only - not in the final build
 Jumper Wires,120pc dupont jumper wire set,1,11.25,3.00,3.00,Tool,https://www.amazon.sa/s?k=dupont+jumper+wires+120pcs,Prototyping only - not in the final build
 Soldering Iron Kit,60W adjustable soldering iron + digital multimeter + spare tips,1,75.99,20.26,20.26,Tool,https://www.amazon.sa/dp/B08DFYGC6V,Multimeter is used for continuity testing
