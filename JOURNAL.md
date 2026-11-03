@@ -22,6 +22,6 @@ Today I researched for the parts and check their prices, I also found a small to
 
 ![wokwi wiring diagram](images/diagram.png)
 
-![BOM with live prices](src/BOM.csv)
+![BOM with live prices](Boombanana_IRL/photo_2026-11-02_15-18-48.jpg)
 
 **Total time spent: 3h 35m**
