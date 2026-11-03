@@ -157,7 +157,50 @@ Rules that keep mounts from breaking:
 - ❌ Mounts that block the USB port or the BOOT button.
 - ❌ Screwing into a 3 mm wall without a boss.
 
-## 10. Assembly order (matters)
+## 10. Text on the case
+
+Numbers that survive FDM printing (0.4 mm nozzle):
+
+| Setting | Value |
+|---|---|
+| Method | **engrave** (extrude cut), not raised — raised text gets ironed flat and looks mushy |
+| Engrave depth | 0.6 (0.8 if you use a 0.6 mm nozzle) |
+| Minimum stroke width | 0.8 — below that the letters print as blobs |
+| Minimum cap height | 6.0 (8.0 is comfortable) |
+| Letter spacing | +5 % over default |
+| Distance from any edge | ≥ 3.0 |
+| Distance from any hole | ≥ 2.0 |
+| Font | bold sans-serif, no serifs, no script |
+
+**Print orientation trap:** engraved text must be on the **top** face while
+printing, or the nozzle smears it. So the front shell prints **open side down,
+front face up**. That means the rabbet on the rim becomes a 1.5 mm overhang —
+give it a 45° chamfer on the inside edge and it prints without supports.
+
+How to read the result: engraved grooves are the same colour as the case, so
+fill them with a contrasting colour after printing:
+
+1. Paint the engraved area with black acrylic / a matte paint pen.
+2. Wait until tacky-dry, then wipe the flat surface with a cloth + a drop of
+   IPA. The paint stays only inside the grooves.
+3. One thin clear coat on top if it rubs off.
+
+Onshape steps: open the front shell → **Sketch** on the front face → **Text**
+tool → type → set height in mm → place → green check → **Extrude → Remove →
+0.6 mm**. Text on a curved surface is not supported well — keep all text on
+flat faces.
+
+What is worth labelling (the players need it, the reviewer likes it):
+
+| Where | Text |
+|---|---|
+| Front, top centre | `BOMBANANA` (or `BOMBANANA IRL`) |
+| Under the screen | module name: `CABLE` / `SWITCH` |
+| Next to each jack | `1 2 3 4` — the manual refers to wires by number |
+| Next to the start button | `START` |
+| Back, bottom corner | `v1 · <your name> · 2026` — cheap, and it makes it yours |
+
+## 11. Assembly order (matters)
 
 1. Print and check the test plate.
 2. Solder the perfboard and test everything on the bench **before** it goes in.
