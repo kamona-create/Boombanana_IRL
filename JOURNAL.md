@@ -6,22 +6,21 @@ created_at: "2026-11-02"
 ---
 
 
-# November 2: Paper prototype and first plan:
+# November 2: Paper prototype and first plan
 
-November 2: Paper prototype and first plan:
 I played a paper version of the game and it was exciting and wonderful,
 I also wanted to test the game before developing it to see if its really worth it, the paper version was boring because it needed to be with real interactions, so I spend the whole day drawing what the game will look like
 and finally i found the best design for me.
 
-![paper prototype](photo_2026-11-02_15-18-48.jpg)
+![paper prototype](images/paper-prototype.jpg)
 
 **Total time spent: 2h 7m**
 
 # November 3: Picking real parts and drawing the pin map
 Today I researched for the parts and check their prices, I also found a small touch screen but, Its complicated for me to program it so i selected a regular TFT 2.4IN screen instead, for me prefboard is better than a PCB so i choose it , I also designed the case for the project and it looked perfectly good. 
 
-![wokwi wiring diagram](images/diagram.png)
+![case design in Onshape](images/case-design.png)
 
-![BOM with live prices](BOM.csv)
+Parts list with live prices: [BOM.csv](BOM.csv)
 
 **Total time spent: 3h 35m**
