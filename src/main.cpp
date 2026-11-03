@@ -6,14 +6,12 @@
  * This firmware only handles the electronics.
  *
  * Display : 2.4" ILI9341 SPI, 320x240 landscape (no touch)
- * LEDs    : 5x WS2812B addressable on ONE data pin
- *           LED 0      = big "lamp" colour for the round
- *           LED 1..4   = socket indicators (green = plugged, off = cut)
+ * LEDs    : 1x RGB LED (the big "lamp") + 4x green LEDs (socket indicators)
+ *           only the lamp needs colour, so no addressable LEDs and no extra library
  */
 
 #include <Arduino.h>
 #include <TFT_eSPI.h>
-#include <Adafruit_NeoPixel.h>
 
 // ================= PINS =================
 // Banana jacks: side A -> GPIO, side B -> GND
@@ -24,14 +22,18 @@
 
 #define PIN_BUZZER  32      // was 18 - 18 is VSPI SCK for the TFT
 #define PIN_START   33
-#define PIN_LEDS    27      // WS2812B data (all 5 LEDs daisy-chained)
+
+// Big lamp = one RGB LED. Sockets = one green LED each (plugged / cut).
+#define PIN_LAMP_R  25
+#define PIN_LAMP_G  26
+#define PIN_LAMP_B  27
+#define PIN_SOCK1    4
+#define PIN_SOCK2   12
+#define PIN_SOCK3   15
+#define PIN_SOCK4   21
 
 // TFT (set in platformio.ini build_flags):
 //   MOSI 23 | MISO 19 | SCK 18 | CS 5 | DC 2 | RST 4 | BL -> 3V3
-
-#define NUM_LEDS    5
-#define LED_LAMP    0
-#define LED_FIRST   1       // LEDs 1..4 = jacks 1..4
 
 // ================= GAME CONFIG =================
 const uint32_t GAME_SECONDS = 150;   // 2:30
@@ -59,7 +61,7 @@ const int8_t TABLE_4[3] = { 3, 2, 1 };  // 4 wires: RED->4th, GREEN->3rd, BLUE->
 
 // ================= OBJECTS =================
 TFT_eSPI tft = TFT_eSPI();
-Adafruit_NeoPixel leds(NUM_LEDS, PIN_LEDS, NEO_GRB + NEO_KHZ800);
+const int SOCK_PINS[4] = { PIN_SOCK1, PIN_SOCK2, PIN_SOCK3, PIN_SOCK4 };
 
 enum State { IDLE, RUNNING, BOOM, WIN };
 State state = IDLE;
@@ -129,38 +131,41 @@ void soundBoom() {
 
 // ================= LEDS =================
 void ledsBegin() {
-  leds.begin();
-  leds.setBrightness(60);      // keep current low, 5 LEDs on USB power
-  leds.clear();
-  leds.show();
+  pinMode(PIN_LAMP_R, OUTPUT);
+  pinMode(PIN_LAMP_G, OUTPUT);
+  pinMode(PIN_LAMP_B, OUTPUT);
+  for (int i = 0; i < 4; i++) pinMode(SOCK_PINS[i], OUTPUT);
+  ledsOff();
 }
 
 void setLamp(int idx) {
-  leds.setPixelColor(LED_LAMP, leds.Color(COLOR_RGB[idx][0],
-                                          COLOR_RGB[idx][1],
-                                          COLOR_RGB[idx][2]));
-  leds.show();
+  digitalWrite(PIN_LAMP_R, COLOR_RGB[idx][0] ? HIGH : LOW);
+  digitalWrite(PIN_LAMP_G, COLOR_RGB[idx][1] ? HIGH : LOW);
+  digitalWrite(PIN_LAMP_B, COLOR_RGB[idx][2] ? HIGH : LOW);
 }
 
 void updateSocketLeds() {
   for (int i = 0; i < 4; i++) {
     bool plugged = (digitalRead(JACK_PINS[i]) == JACK_CLOSED);
     bool used    = (i < wireCount);
-    if (plugged && used)      leds.setPixelColor(LED_FIRST + i, leds.Color(0, 40, 0));
-    else if (plugged)         leds.setPixelColor(LED_FIRST + i, leds.Color(10, 10, 10));
-    else                      leds.setPixelColor(LED_FIRST + i, 0);
+    digitalWrite(SOCK_PINS[i], (plugged && used) ? HIGH : LOW);
   }
-  leds.show();
 }
 
 void ledsOff() {
-  leds.clear();
-  leds.show();
+  digitalWrite(PIN_LAMP_R, LOW);
+  digitalWrite(PIN_LAMP_G, LOW);
+  digitalWrite(PIN_LAMP_B, LOW);
+  for (int i = 0; i < 4; i++) digitalWrite(SOCK_PINS[i], LOW);
 }
 
+// Flash the whole set one colour (boom = red, win = green).
 void ledsFlash(uint8_t r, uint8_t g, uint8_t b) {
-  for (int i = 0; i < NUM_LEDS; i++) leds.setPixelColor(i, leds.Color(r, g, b));
-  leds.show();
+  digitalWrite(PIN_LAMP_R, r ? HIGH : LOW);
+  digitalWrite(PIN_LAMP_G, g ? HIGH : LOW);
+  digitalWrite(PIN_LAMP_B, b ? HIGH : LOW);
+  bool on = (r || g || b);
+  for (int i = 0; i < 4; i++) digitalWrite(SOCK_PINS[i], on ? HIGH : LOW);
 }
 
 // ================= DRAW =================

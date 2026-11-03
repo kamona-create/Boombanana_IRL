@@ -1,21 +1,25 @@
-Item,Description,Qty,Unit Price (USD),Total (USD),Type,Link,Notes
-ESP32 DevKit V1,ESP32-WROOM-32 30-pin development board,1,6.00,6.00,Part,,Main controller
-2.4in TFT Display,ILI9341 SPI 240x320 TFT module (no touch),1,9.00,9.00,Part,,Timer and strikes screen
-Passive Buzzer,5V passive buzzer,1,1.00,1.00,Part,,Tick and boom sound (active buzzers will not work)
-Banana Jack,Panel-mount banana jack (JS-910B style),8,1.50,12.00,Part,,Wire module sockets - 4 pairs
-Banana Plug Lead,Banana plug test lead 50cm,4,2.00,8.00,Part,,The wires players pull
-Toggle Switch,SPDT panel toggle switch,4,0.50,2.00,Part,,Switch module
-WS2812B LED,5mm addressable RGB LED (daisy-chained, 1 data pin),5,0.60,3.00,Part,,1 big lamp + 4 socket indicators
-Resistor,330 ohm 1/4W (data line),1,0.02,0.02,Part,,WS2812B data protection
-Breadboard,830-point breadboard,1,3.00,3.00,Tool,,Prototyping only - not in final build
-Jumper Wires,120pc dupont jumper wire set,1,3.00,3.00,Tool,,Prototyping only - not in final build
-Power Bank,5V USB power bank 5000mAh,1,10.00,10.00,Part,,Portable power
-USB Cable,USB-A to Micro-USB cable,1,2.00,2.00,Part,,Power and programming
-3D Printed Case,PLA 3D printing service for enclosure 200x140x45mm,1,12.00,12.00,Service,,Local print shop / FABLAB Jubail
-M3 Screws,M3x8mm screws and nuts,20,0.10,2.00,Part,,Assembly
-JST-XH Connector Kit,JST-XH 2/3/4-pin connector set,1,4.00,4.00,Part,,Module connections
-Soldering Iron Kit,60W adjustable soldering iron + digital multimeter + spare tips,1,20.30,20.30,Tool,https://www.amazon.sa/dp/B08DFYGC6V,Assembly tool - 75.99 SAR - reused for all future projects
-Solder Wire,0.8mm rosin core solder 100g,1,3.95,3.95,Consumable,https://www.amazon.sa/dp/B0CK5MRFC7,14.79 SAR
-Heat Shrink Tube Kit,530pcs 2:1 assorted heat shrink tubing,1,4.25,4.25,Consumable,https://www.amazon.sa/dp/B07N6NVFYF,Joint insulation - 16.00 SAR
-Hook-up Wire,22AWG stranded wire for panel wiring,1,4.00,4.00,Consumable,,Jack to JST wiring
-TOTAL,,,,109.52,,"Parts 59.02 + Tools 26.30 + Consumables/service 24.20 = 109.52"
+Item,Description,Qty,Unit Price (SAR),Unit Price (USD),Total (USD),Type,Link,Notes
+ESP32 DevKit V1,ESP32-WROOM-32 30-pin USB Type-C CP2102,1,45.00,12.00,12.00,Part,https://ielectrony.com/en/product/esp32-development-board-30-pins-usb-type-c-cp2102/,Main controller
+2.4in TFT Display,ILI9341 SPI 240x320 TFT module 18-pin (no touch),1,44.85,11.96,11.96,Part,https://www.amazon.sa/dp/B09BCJSMVZ,Timer and strikes screen
+Passive Buzzer,Passive buzzer module 5V (must be passive - active cannot play tones),1,17.10,4.56,4.56,Part,https://www.amazon.sa/dp/B07NDYJB6D,Tick and boom sound
+Banana Jack Red,JS-910B 4mm panel socket red (panel hole 8mm),4,3.50,0.93,3.73,Part,https://ielectrony.com/en/product/red-binding-post-female-socket-jack-for-4mm-banana-plug-connectors/,Wire module sockets - signal side
+Banana Jack Black,JS-910B 4mm panel socket black (panel hole 8mm),4,3.50,0.93,3.73,Part,https://ielectrony.com/en/product/black-binding-post-female-socket-jack-for-4mm-banana-plug-connectors/,Wire module sockets - GND side
+Banana Plug Red,4mm male banana plug red (solder type),4,3.50,0.93,3.73,Part,https://ielectrony.com/en/product/red-4mm-male-banana-plug-connector/,One end of each pullable wire
+Banana Plug Black,4mm male banana plug black (solder type),4,3.50,0.93,3.73,Part,https://ielectrony.com/en/product/black-4mm-male-banana-plug-connector/,Other end of each pullable wire
+Toggle Switch,MTS-203 mini toggle switch 6-pin DPDT (one pole used as on/off),4,5.00,1.33,5.33,Part,https://ielectrony.com/en/product/%d8%b3%d9%88%d9%8a%d8%aa%d8%b4-on-off-on-6-pin/,Switch module
+RGB LED,5mm 4-pin common-cathode RGB LED (the big lamp),1,3.00,0.80,0.80,Part,https://ielectrony.com/en/product/led-rgb-5mm-4-pins-cc-1pcs/,Round colour shown to the players
+Green LED,5mm green LED (socket indicator: plugged / cut),4,0.50,0.13,0.53,Part,https://ielectrony.com/en/product/green-led-5mm-1pcs/,One per banana socket
+Resistor,220 ohm 1/4W (3 for the RGB + 4 for the green LEDs),7,0.50,0.13,0.93,Part,https://ielectrony.com/en/product/%d8%b9%d8%af%d8%af-1-%d9%85%d9%82%d8%a7%d9%88%d9%85%d8%a9-220-ohm-1-4w/,LED current limiting
+Perfboard,8x12 cm single-sided prototype board 2.54mm pitch,1,9.75,2.60,2.60,Part,https://ielectrony.com/en/product/812cm-universal-pcb-prototype-board-single-sided-2-54mm-hole-pitch/,All wiring lives here
+JST-XH Connector Kit,JST-XH 2/3/4-pin connector set (1180 pcs),1,65.53,17.47,17.47,Part,https://www.amazon.sa/dp/B07CTH46S7,Module connections - a 10-pack would be cheaper
+M3 Screws,M3x8mm screws + nuts assortment kit,1,45.63,12.17,12.17,Part,https://www.amazon.sa/dp/B0DMZNS9MH,Case assembly + board standoffs
+Power Bank,5V USB power bank 5000mAh,1,37.50,10.00,10.00,Part,https://www.amazon.sa/s?k=power+bank+5000mah,Portable power - any local shop works
+USB Cable,USB-A to USB-C cable 1m (matches the ESP32 Type-C port),1,7.50,2.00,2.00,Part,https://www.amazon.sa/s?k=usb+a+to+usb+c+cable+1m,Power and programming
+Hook-up Wire,22AWG stranded wire red + black,1,15.00,4.00,4.00,Part,https://www.amazon.sa/s?k=22awg+stranded+hook+up+wire,Panel wiring and the pullable wires
+3D Printed Case,PLA print of the enclosure 200x140x45mm (2 shells + test plate),1,45.00,12.00,12.00,Service,,Local print shop / FABLAB Jubail (no link)
+Breadboard,830-point breadboard,1,38.00,10.13,10.13,Tool,https://www.amazon.sa/dp/B07MX3LC5R,Prototyping only - not in the final build
+Jumper Wires,120pc dupont jumper wire set,1,11.25,3.00,3.00,Tool,https://www.amazon.sa/s?k=dupont+jumper+wires+120pcs,Prototyping only - not in the final build
+Soldering Iron Kit,60W adjustable soldering iron + digital multimeter + spare tips,1,75.99,20.26,20.26,Tool,https://www.amazon.sa/dp/B08DFYGC6V,Multimeter is used for continuity testing
+Solder Wire,0.8mm rosin core solder 100g,1,14.79,3.94,3.94,Consumable,https://www.amazon.sa/dp/B0CK5MRFC7,
+Heat Shrink Tube Kit,530pcs 2:1 assorted heat shrink tubing,1,16.00,4.27,4.27,Consumable,https://www.amazon.sa/dp/B07N6NVFYF,Joint insulation
+TOTAL,,,,"Parts 99.27 | Tools 33.39 | Consumables 8.21 | Service 12.00",152.87,,,Prices checked 3 Nov 2026 - SAR converted at 3.75

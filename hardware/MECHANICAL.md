@@ -53,7 +53,7 @@ Notes:
 | 4 mm banana plug (male, solder) | pin Ø4.0, total length 38, body Ø9.5 | plugs into the jack |
 | Panel toggle switch (SPDT, M12) | thread M12 x 0.75, panel hole Ø12.2, body behind panel ~20, lever 12 | nut behind the panel |
 | Push button 12 mm (start) | panel hole Ø12.2, body behind panel ~18 | nut behind the panel |
-| WS2812B 5 mm LED | body Ø5.0, height 6.0, 3 legs on 2.54 pitch | press-fit into a Ø5.1 hole, glued or friction |
+| 5 mm LED (1x RGB + 4x green) | body Ø5.0, height 6.0, legs on 2.54 pitch | press-fit into a Ø5.1 hole |
 | Passive buzzer (bare, 5V) | Ø12.0 x 9.5 | Ø12.2 hole + a drop of hot glue, or a printed ring |
 | Buzzer module (3-pin PCB type) | ~20 x 15 x 8 | M2 screws or glue |
 | Perfboard 15 x 9 cm | 150.0 x 90.0 x 1.6, holes Ø1.0 on 2.54 pitch | 4x M3 holes at the corners, standoffs 6 mm |
@@ -73,7 +73,7 @@ Add **2 mm** of clearance around every part that is not screwed down
 | 3 | Screen screw bosses | Ø2.5 | 4 | front (inside) | bosses Ø5.0, height = 2.5 (module thickness) |
 | 4 | Start button | Ø12.2 | 1 | front | 12 mm push button |
 | 5 | Toggle switches | Ø12.2 | 4 | front | switch module panel, 25 mm between centres |
-| 6 | WS2812B LEDs | Ø5.1 | 5 | front | 1 big lamp + 4 socket indicators; leave 1.2 mm between LED holes |
+| 6 | LED holes (1 RGB + 4 green) | Ø5.1 | 5 | front | 1 big lamp + 4 socket indicators; leave 1.2 mm between LED holes |
 | 7 | Buzzer | Ø2.0 | 6 | side | drill pattern instead of one big hole, keeps dust out |
 | 8 | USB port | 9.0 x 4.0 | 1 | right side | 25 mm from the front face so the cable doesn't foul the table |
 | 9 | Reset/BOOT access | Ø3.0 | 2 | back | so you can reflash without opening the case |
@@ -135,7 +135,7 @@ own nut. The table below says which is which.
 | Banana jack | the part's own nut | hole Ø8.2, washer behind | the hole *is* the mount |
 | Toggle switch | own nut + anti-rotation flat | hole Ø12.2 + 1.5 wide keyway slot | M12 switches spin if you don't key them |
 | Start button | own nut | hole Ø12.2 | same |
-| WS2812B | press-fit + 0.6 mm retention lip | hole Ø5.1, lip on the inside | glue alone pops out with heat |
+| 5 mm LEDs (5) | press-fit + 0.6 mm retention lip | hole Ø5.1, lip on the inside | glue alone pops out with heat |
 | Buzzer | two-piece ring, 2x M2 | ring OD Ø18, ID Ø12.2, ears with Ø2.2 | needs to be serviceable, not glued |
 | Power bank | strap slots for velcro | slot 3.2 x 1.6, **do not** model a tight pocket | power bank sizes vary by ±5 mm |
 | Wiring | 3x cable clips or zip-tie slots | clip gap 0.8 for 22 AWG, slot 3.2 x 1.6 | so pulling a cable never loads a solder joint |
