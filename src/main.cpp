@@ -1,31 +1,37 @@
 /*
- * BOMBANANA IRL - v1 firmware (simulation build)
- * Module: CABLE + timer + strikes + buzzer
+ * BOMBANANA IRL - v1 firmware
+ * Modules: CABLE (4 banana jacks) + SWITCH panel + timer + strikes + buzzer
  *
- * Roles: blind (touch), deaf (sight), mute (manual).
- * This firmware only handles electronics. Human roles are the players.
+ * Roles are human: blind (touch), deaf (sight), mute (reads the manual).
+ * This firmware only handles the electronics.
+ *
+ * Display : 2.4" ILI9341 SPI, 320x240 landscape (no touch)
+ * LEDs    : 5x WS2812B addressable on ONE data pin
+ *           LED 0      = big "lamp" colour for the round
+ *           LED 1..4   = socket indicators (green = plugged, off = cut)
  */
 
 #include <Arduino.h>
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+#include <TFT_eSPI.h>
+#include <Adafruit_NeoPixel.h>
 
 // ================= PINS =================
+// Banana jacks: side A -> GPIO, side B -> GND
 #define PIN_JACK1   13
 #define PIN_JACK2   14
 #define PIN_JACK3   16
 #define PIN_JACK4   17
-#define PIN_BUZZER  18
-#define PIN_LED_R   25
-#define PIN_LED_G   26
-#define PIN_LED_B   27
-#define PIN_START    4
 
-// I2C pins for the OLED (ESP32 default I2C bus)
-#define I2C_SDA     21
-#define I2C_SCL     22
-#define OLED_ADDR   0x3C
+#define PIN_BUZZER  32      // was 18 - 18 is VSPI SCK for the TFT
+#define PIN_START   33
+#define PIN_LEDS    27      // WS2812B data (all 5 LEDs daisy-chained)
+
+// TFT (set in platformio.ini build_flags):
+//   MOSI 23 | MISO 19 | SCK 18 | CS 5 | DC 2 | RST 4 | BL -> 3V3
+
+#define NUM_LEDS    5
+#define LED_LAMP    0
+#define LED_FIRST   1       // LEDs 1..4 = jacks 1..4
 
 // ================= GAME CONFIG =================
 const uint32_t GAME_SECONDS = 150;   // 2:30
@@ -38,17 +44,22 @@ const int MAX_STRIKES       = 3;
 const int JACK_CLOSED = LOW;
 
 const int JACK_PINS[4] = { PIN_JACK1, PIN_JACK2, PIN_JACK3, PIN_JACK4 };
-const int LED_PINS[3]  = { PIN_LED_R, PIN_LED_G, PIN_LED_B };
 
 const char* COLOR_NAME[3] = { "RED", "GREEN", "BLUE" };
+const uint8_t COLOR_RGB[3][3] = {
+  { 255,   0,   0 },
+  {   0, 200,   0 },
+  {   0,   0, 255 },
+};
 
 // Manual table: which wire index (0-based) to cut.
-// Update these numbers if you change the printed manual.
+// These MUST match the printed manual.
 const int8_t TABLE_3[3] = { 2, 0, 1 };  // 3 wires: RED->3rd, GREEN->1st, BLUE->2nd
 const int8_t TABLE_4[3] = { 3, 2, 1 };  // 4 wires: RED->4th, GREEN->3rd, BLUE->2nd
 
-// ================= DISPLAY =================
-Adafruit_SSD1306 display(128, 64, &Wire, -1);
+// ================= OBJECTS =================
+TFT_eSPI tft = TFT_eSPI();
+Adafruit_NeoPixel leds(NUM_LEDS, PIN_LEDS, NEO_GRB + NEO_KHZ800);
 
 enum State { IDLE, RUNNING, BOOM, WIN };
 State state = IDLE;
@@ -61,7 +72,14 @@ int  colorIdx  = 0;      // 0 RED, 1 GREEN, 2 BLUE
 int  targetWire = 0;
 bool armed = false;      // true when all wires are plugged in again
 int  lastJack[4] = { LOW, LOW, LOW, LOW };
-uint32_t lastDraw = 0;
+
+// what is currently on screen (so we only redraw what changed)
+long lastShownSec     = -1;
+int  lastShownStrikes = -1;
+int  lastShownRound   = -1;
+int  lastShownWires   = -1;
+bool lastShownArmed   = false;
+int  lastShownColor   = -1;
 
 // ================= BUZZER =================
 void buzzerInit() {
@@ -109,94 +127,132 @@ void soundBoom() {
   delay(200);
 }
 
-// ================= INDICATOR LED =================
-void setIndicator(int idx) {
-  for (int i = 0; i < 3; i++) {
-    digitalWrite(LED_PINS[i], (i == idx) ? HIGH : LOW);
-  }
+// ================= LEDS =================
+void ledsBegin() {
+  leds.begin();
+  leds.setBrightness(60);      // keep current low, 5 LEDs on USB power
+  leds.clear();
+  leds.show();
 }
 
-void indicatorOff() {
-  for (int i = 0; i < 3; i++) digitalWrite(LED_PINS[i], LOW);
+void setLamp(int idx) {
+  leds.setPixelColor(LED_LAMP, leds.Color(COLOR_RGB[idx][0],
+                                          COLOR_RGB[idx][1],
+                                          COLOR_RGB[idx][2]));
+  leds.show();
+}
+
+void updateSocketLeds() {
+  for (int i = 0; i < 4; i++) {
+    bool plugged = (digitalRead(JACK_PINS[i]) == JACK_CLOSED);
+    bool used    = (i < wireCount);
+    if (plugged && used)      leds.setPixelColor(LED_FIRST + i, leds.Color(0, 40, 0));
+    else if (plugged)         leds.setPixelColor(LED_FIRST + i, leds.Color(10, 10, 10));
+    else                      leds.setPixelColor(LED_FIRST + i, 0);
+  }
+  leds.show();
+}
+
+void ledsOff() {
+  leds.clear();
+  leds.show();
+}
+
+void ledsFlash(uint8_t r, uint8_t g, uint8_t b) {
+  for (int i = 0; i < NUM_LEDS; i++) leds.setPixelColor(i, leds.Color(r, g, b));
+  leds.show();
 }
 
 // ================= DRAW =================
 void drawIdle() {
-  display.clearDisplay();
-  display.setTextColor(SSD1306_WHITE);
-  display.setTextSize(1);
-  display.setCursor(0, 0);
-  display.print("BOMBANANA IRL");
-  display.setCursor(0, 18);
-  display.setTextSize(2);
-  display.print("READY");
-  display.setTextSize(1);
-  display.setCursor(0, 40);
-  display.print("3 players / 150s");
-  display.setCursor(0, 52);
-  display.print("PRESS START");
-  display.display();
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextDatum(MC_DATUM);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.drawString("BOMBANANA IRL", 160, 50, 4);
+  tft.drawString("READY", 160, 110, 7);
+  tft.drawString("3 players  /  150 seconds", 160, 175, 2);
+  tft.setTextColor(TFT_GREEN, TFT_BLACK);
+  tft.drawString("PRESS START", 160, 210, 2);
+
+  lastShownSec = -1;
+  lastShownStrikes = -1;
+  lastShownRound = -1;
+  lastShownWires = -1;
+  lastShownArmed = false;
+  lastShownColor = -1;
 }
 
-void drawRunning() {
-  uint32_t elapsed = (millis() - startMs) / 1000;
-  long remaining = (long)GAME_SECONDS - (long)elapsed;
-  if (remaining < 0) remaining = 0;
-
+void drawTimer(long remaining) {
   char buf[8];
   snprintf(buf, sizeof(buf), "%02ld:%02ld", remaining / 60, remaining % 60);
-
-  display.clearDisplay();
-  display.setTextColor(SSD1306_WHITE);
-
-  display.setTextSize(1);
-  display.setCursor(0, 0);
-  display.print("CABLE ");
-  display.print(roundNo + 1);
-  display.print("/");
-  display.print(TOTAL_ROUNDS);
-
-  // strikes as X X .
-  for (int i = 0; i < MAX_STRIKES; i++) {
-    display.setCursor(104 + i * 8, 0);
-    display.print(i < strikes ? "X" : ".");
-  }
-
-  display.setTextSize(2);
-  display.setCursor(0, 12);
-  display.print(buf);
-
-  display.setTextSize(1);
-  display.setCursor(0, 34);
-  display.print("WIRES: ");
-  display.print(wireCount);
-
-  display.setCursor(0, 44);
-  display.print("LAMP : ");
-  display.print(COLOR_NAME[colorIdx]);
-
-  display.setCursor(0, 56);
-  if (armed) {
-    display.print("PULL ONE WIRE");
-  } else {
-    display.print("RE-PLUG WIRES");
-  }
-
-  display.display();
+  uint16_t col = (remaining <= 20) ? TFT_RED : TFT_WHITE;
+  tft.fillRect(20, 80, 280, 70, TFT_BLACK);
+  tft.setTextDatum(MC_DATUM);
+  tft.setTextColor(col, TFT_BLACK);
+  tft.drawString(buf, 160, 115, 7);
+  lastShownSec = remaining;
 }
 
-void drawEnd(const char* big, const char* small) {
-  display.clearDisplay();
-  display.setTextColor(SSD1306_WHITE);
-  display.setTextSize(2);
-  display.setCursor(0, 8);
-  display.print(big);
-  display.setTextSize(1);
-  display.setCursor(0, 40);
-  display.print(small);
-  display.setCursor(0, 54);
-  display.print("PRESS START");
-  display.display();
+void drawStatus() {
+  // header
+  tft.setTextDatum(TL_DATUM);
+  tft.setTextColor(TFT_DARKGREY, TFT_BLACK);
+  tft.drawString("BOMBANANA IRL", 8, 8, 2);
+
+  // strikes, top right
+  char st[8];
+  for (int i = 0; i < MAX_STRIKES; i++) st[i] = (i < strikes) ? 'X' : '-';
+  st[MAX_STRIKES] = 0;
+  tft.setTextDatum(TR_DATUM);
+  tft.setTextColor(strikes ? TFT_RED : TFT_DARKGREY, TFT_BLACK);
+  tft.drawString(st, 312, 8, 2);
+
+  // bottom rows
+  tft.setTextDatum(TL_DATUM);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  char row1[24];
+  snprintf(row1, sizeof(row1), "CABLE %d/%d", roundNo + 1, TOTAL_ROUNDS);
+  tft.fillRect(0, 155, 200, 26, TFT_BLACK);
+  tft.drawString(row1, 8, 158, 2);
+
+  char row1b[16];
+  snprintf(row1b, sizeof(row1b), "WIRES: %d", wireCount);
+  tft.fillRect(200, 155, 120, 26, TFT_BLACK);
+  tft.setTextDatum(TR_DATUM);
+  tft.drawString(row1b, 312, 158, 2);
+
+  tft.setTextDatum(TL_DATUM);
+  char row2[24];
+  snprintf(row2, sizeof(row2), "LAMP: %s", COLOR_NAME[colorIdx]);
+  tft.setTextColor(TFT_YELLOW, TFT_BLACK);
+  tft.fillRect(0, 185, 170, 26, TFT_BLACK);
+  tft.drawString(row2, 8, 188, 2);
+
+  tft.setTextDatum(TR_DATUM);
+  tft.setTextColor(armed ? TFT_GREEN : TFT_ORANGE, TFT_BLACK);
+  tft.fillRect(170, 185, 150, 26, TFT_BLACK);
+  tft.drawString(armed ? "PULL ONE WIRE" : "PLUG ALL WIRES", 312, 188, 2);
+
+  tft.setTextDatum(TL_DATUM);
+  lastShownStrikes = strikes;
+  lastShownRound   = roundNo;
+  lastShownWires   = wireCount;
+  lastShownArmed   = armed;
+  lastShownColor   = colorIdx;
+}
+
+void drawEnd(const char* big, const char* small, uint16_t col) {
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextDatum(MC_DATUM);
+  tft.setTextColor(col, TFT_BLACK);
+  tft.drawString(big, 160, 100, 7);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.drawString(small, 160, 165, 2);
+  tft.setTextColor(TFT_GREEN, TFT_BLACK);
+  tft.drawString("PRESS START", 160, 200, 2);
+
+  lastShownSec = -1;
+  lastShownStrikes = -1;
 }
 
 // ================= GAME LOGIC =================
@@ -216,7 +272,8 @@ void newRound() {
   colorIdx   = random(3);
   targetWire = (wireCount == 3) ? TABLE_3[colorIdx] : TABLE_4[colorIdx];
   armed      = false;
-  setIndicator(colorIdx);
+  updateSocketLeds();
+  setLamp(colorIdx);
 }
 
 void startGame() {
@@ -224,22 +281,24 @@ void startGame() {
   roundNo = 0;
   startMs = millis();
   state = RUNNING;
+  tft.fillScreen(TFT_BLACK);
   newRound();
+  drawStatus();
   soundStart();
 }
 
 void gameOver() {
   state = BOOM;
-  indicatorOff();
   soundBoom();
-  drawEnd("BOOM!", "Bomb exploded");
+  ledsFlash(255, 0, 0);
+  drawEnd("BOOM!", "The bomb exploded", TFT_RED);
 }
 
 void gameWin() {
   state = WIN;
-  indicatorOff();
   soundWin();
-  drawEnd("DEFUSED", "You saved the day");
+  ledsFlash(0, 200, 0);
+  drawEnd("DEFUSED", "You saved the day", TFT_GREEN);
 }
 
 void handleCut(int idx) {
@@ -269,7 +328,7 @@ void handleStartButton() {
     if (state == IDLE) {
       startGame();
     } else if (state == BOOM || state == WIN) {
-      delay(300);
+      ledsOff();
       startGame();
     }
   }
@@ -290,43 +349,24 @@ void updateTimer() {
     if (remaining > 60)      beep(2000, 8);
     else if (remaining > 20) beep(2200, 10);
     else                     beep(2600, 12);
+    drawTimer(remaining);
   }
 }
 
 // ================= SETUP / LOOP =================
-void scanI2C() {
-  Serial.println("Scanning I2C bus...");
-  for (byte addr = 1; addr < 127; addr++) {
-    Wire.beginTransmission(addr);
-    if (Wire.endTransmission() == 0) {
-      Serial.print("  found device at 0x");
-      Serial.println(addr, HEX);
-    }
-  }
-  Serial.println("Scan done.");
-}
-
 void setup() {
   Serial.begin(115200);
 
   pinMode(PIN_START, INPUT_PULLUP);
   for (int i = 0; i < 4; i++) pinMode(JACK_PINS[i], INPUT_PULLUP);
-  for (int i = 0; i < 3; i++) {
-    pinMode(LED_PINS[i], OUTPUT);
-    digitalWrite(LED_PINS[i], LOW);
-  }
 
+  tft.init();
+  tft.setRotation(1);           // 320x240 landscape
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextWrap(false);
+
+  ledsBegin();
   buzzerInit();
-
-  Wire.begin(I2C_SDA, I2C_SCL);
-  if (!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR)) {
-    Serial.println("SSD1306 not found. Check: SDA=21, SCL=22, VCC=3V3, GND=GND");
-    scanI2C();
-  } else {
-    Serial.println("SSD1306 OK");
-  }
-  display.clearDisplay();
-  display.display();
 
   randomSeed(micros());
 
@@ -343,25 +383,37 @@ void loop() {
     updateTimer();
     if (state != RUNNING) return;
 
-    if (!armed && allPlugged()) {
-      armed = true;
-    }
-
+    bool jackChanged = false;
     for (int i = 0; i < 4; i++) {
       int v = readJack(i);
-      bool nowCut  = (v != JACK_CLOSED);
-      bool wasCut  = (lastJack[i] != JACK_CLOSED);
-      lastJack[i]  = v;
+      if (v != lastJack[i]) jackChanged = true;
+      lastJack[i] = v;
+    }
 
-      if (armed && nowCut && !wasCut && i < wireCount) {
-        handleCut(i);
-        break;
+    if (!armed && allPlugged()) {
+      armed = true;
+      drawStatus();
+    }
+
+    if (jackChanged) {
+      updateSocketLeds();
+      for (int i = 0; i < 4; i++) {
+        int v = readJack(i);
+        bool nowCut = (v != JACK_CLOSED);
+        if (armed && nowCut && i < wireCount) {
+          handleCut(i);
+          break;
+        }
       }
     }
 
-    if (state == RUNNING && millis() - lastDraw > 200) {
-      lastDraw = millis();
-      drawRunning();
+    if (state == RUNNING) {
+      if (strikes  != lastShownStrikes ||
+          roundNo  != lastShownRound   ||
+          wireCount != lastShownWires  ||
+          colorIdx != lastShownColor) {
+        drawStatus();
+      }
     }
   }
 }

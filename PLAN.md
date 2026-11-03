@@ -45,7 +45,7 @@ Schematic Editor
 | ESP32 DevKit V1 | 1 | لو مش موجود في المكتبة، استخدم `Connector_Generic:Conn_01x15` |
 | Banana Jack | 8 | 4 أزواج |
 | Toggle Switch (SPDT) | 4 | |
-| RGB LED | 5 | 4 للمفاتيح + 1 للأسلاك |
+| WS2812B LED | 5 | 1 لمبة كبيرة + 4 لمؤشرات المقابس (سلك بيانات واحد) |
 | Buzzer | 1 | |
 | Push Button | 1 | Start |
 | TFT ILI9341 | 1 | استخدم connector 14-pin |
@@ -59,16 +59,16 @@ Schematic Editor
 | Jack 3A | GPIO 16 |
 | Jack 4A | GPIO 17 |
 | كل Jack B | GND (مشترك) |
-| Switch 1–4 | GPIO 32 / 33 / 34 / 35 |
+| Switch 1–4 | GPIO 12 / 15 / 25 / 26 |
 | Switch (الطرف التاني) | GND |
-| RGB LED (مفاتيح) | GPIO 25 / 26 / 27 (أو عبر expander) |
-| Cable LED | GPIO 23 |
-| Buzzer | GPIO 18 |
-| Start Button | GPIO 4 |
-| TFT CS / DC / RST | GPIO 5 / 2 / 15 |
-| TFT MOSI / SCK | GPIO 21 / 22 |
+| WS2812B (الخمسة) | GPIO 27 (سلك بيانات واحد متسلسل) + 330Ω |
+| Buzzer | GPIO 32 (اتنقل من 18 — 18 بقى SCK للشاشة) |
+| Start Button | GPIO 33 |
+| TFT CS / DC / RST | GPIO 5 / 2 / 4 |
+| TFT MOSI / MISO / SCK | GPIO 23 / 19 / 18 |
+| TFT BL | 3V3 (دائم) |
 
-> ⚠️ لو الأطراف خلصت: استخدم **74HC595** أو نقل الـ LEDs لـ GPIO مختلف. ESP32 فيه أطراف كفاية — راجع `pinout` قبل الرسم.
+> ✅ قرار مثبت: الليدات بقت **WS2812B** على سلك بيانات واحد (GPIO 27) بدل 15 طرف لـ 5 ليدات RGB. الأطراف الفاضية: 34 / 35 / 36 / 39 (دخل فقط).
 
 ### التصدير
 ```
