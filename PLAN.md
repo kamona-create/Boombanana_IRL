@@ -16,17 +16,19 @@
 
 ---
 
-## 1) تحديث BOM.csv على GitHub (5 دقايق)
+## 1) حالة الـ BOM ✅
 
-الملف محفوظ محليًا في: `D:\hack-club-projects\BOM.csv`
+`BOM.csv` اتحدّث وخلص. المجموع **152.87$**:
 
-روح على GitHub → `BOM.csv` → القلم ✏️ → `Ctrl+A` → `Delete` → الصق المحتوى الجديد من الملف المحلي → Commit:
+| البند | المبلغ |
+|---|---|
+| Parts | 99.27 |
+| Tools | 33.39 |
+| Consumables | 8.21 |
+| Service (الطباعة) | 12.00 |
 
-```
-Update BOM: 5 RGB LEDs for cable indicator
-```
-
-**التغيير:** RGB LED من 4 لـ 5، والمجموع **66.24$**.
+**ناقص حقيقي:** مفيش **زر Start** في الـ BOM، والكود بيقرأ `PIN_START` (GPIO 33).
+يا تجيب زر وتضيفه، أو تستخدم توجل كمفتاح تشغيل — بس لازم تقرر قبل ما تقطع الفتحة.
 
 ---
 
@@ -44,8 +46,8 @@ Schematic Editor
 |---|---|---|
 | ESP32 DevKit V1 | 1 | لو مش موجود في المكتبة، استخدم `Connector_Generic:Conn_01x15` |
 | Banana Jack | 8 | 4 أزواج |
-| Toggle Switch (SPDT) | 4 | |
-| WS2812B LED | 5 | 1 لمبة كبيرة + 4 لمؤشرات المقابس (سلك بيانات واحد) |
+| Toggle Switch (MTS-203 ميني، 6-pin) | 4 | فتحة Ø6.2 مش Ø12.2 |
+| LED 5mm — 1 RGB + 4 أخضر | 5 | كل واحدة على طرف لوحدها |
 | Buzzer | 1 | |
 | Push Button | 1 | Start |
 | TFT ILI9341 | 1 | استخدم connector 14-pin |
@@ -54,21 +56,21 @@ Schematic Editor
 
 | من | إلى |
 |---|---|
-| Jack 1A | GPIO 13 |
-| Jack 2A | GPIO 14 |
-| Jack 3A | GPIO 16 |
-| Jack 4A | GPIO 17 |
+| Jack 1 / 2 / 3 / 4 (الطرف A) | GPIO **13 / 14 / 16 / 17** |
 | كل Jack B | GND (مشترك) |
-| Switch 1–4 | GPIO 12 / 15 / 25 / 26 |
-| Switch (الطرف التاني) | GND |
-| WS2812B (الخمسة) | GPIO 27 (سلك بيانات واحد متسلسل) + 330Ω |
-| Buzzer | GPIO 32 (اتنقل من 18 — 18 بقى SCK للشاشة) |
-| Start Button | GPIO 33 |
-| TFT CS / DC / RST | GPIO 5 / 2 / 4 |
-| TFT MOSI / MISO / SCK | GPIO 23 / 19 / 18 |
+| لمبة RGB الكبيرة | R=**25** · G=**26** · B=**27** + 220Ω لكل لون |
+| مؤشرات المقابس ×4 | **4 / 21 / 22 / 12** + 220Ω لكل واحدة |
+| Toggle ×4 | **لسه مش متوصلة** — الأطراف الفاضية 34 / 35 / 36 / 39 (دخل فقط، محتاجة مقاومة 10k خارجية) |
+| Buzzer | GPIO **32** (مش 18 — 18 بقى SCK للشاشة) |
+| Start Button | GPIO **33** |
+| TFT CS / DC | GPIO **5 / 2** |
+| TFT RST | **ملغي** — نوصل RST على 3V3 مباشرة (GPIO4 كان بيتعارض مع ليد المقبس الأول) |
+| TFT MOSI / MISO / SCK | GPIO **23 / 19 / 18** |
 | TFT BL | 3V3 (دائم) |
 
-> ✅ قرار مثبت: الليدات بقت **WS2812B** على سلك بيانات واحد (GPIO 27) بدل 15 طرف لـ 5 ليدات RGB. الأطراف الفاضية: 34 / 35 / 36 / 39 (دخل فقط).
+> ⚠️ **GPIO 12** لازم يفضل LOW وقت البوت (strapping pin). توصيله على ليد + مقاومة لـ GND هو الاستخدام الصح — متوصلهوش على 3V3.
+>
+> الأطراف الفاضية: **15** (سيبتها فاضية عن قصد)، **34 / 35 / 36 / 39** (دخل فقط).
 
 ### التصدير
 ```
@@ -87,19 +89,31 @@ File → Export → PDF
 2. **Lapse → Start**
 3. New Document → `Boombanana_IRL_Case`
 
-### المقاسات الأساسية
+### المقاسات الأساسية — من الموديل نفسه
 
 ```
-العلبة: 200 × 140 × 45 مم
-سماكة الجدار: 3 مم
+الغلاف الخارجي: 153.04 (عرض) × 177.80 (طول) × 63.86 (عمق) مم
+التجويف الداخلي: 141.27 × 169.93 × 57.60 مم
+سماكة الوش الأمامي: 3.36 مم
+الحيطان: شمال 5.53 · يمين 6.24 · تحت 4.23 · فوق 3.65
+فتحة الكفر: 148.23 × 175.40 مم عند y = -60.96
 ```
+
+**الشكل:** حوض واحد (tub) مفتوح من الضهر + كفر مسطّح. مش شلين متساويين.
+
+> كل الأرقام في `hardware/MECHANICAL.md` ومتعلمة MEASURED / TARGET / SPEC.
 
 ### الخطوة 1 — الصندوق
 ```
-Sketch (Front plane) → Rectangle 200 × 140
-Extrude → 45 mm (Symmetric)
-Shell → 3 mm  (افتح الوش العلوي)
+Sketch (Front plane) → Rectangle 153.04 × 177.80
+Extrude → 63.86 mm
+Shell → 3.4 mm (ارتفاع التجويف لـ 57.60)
+افتح الوش اللي عند y = -60.96 (الضهر)
 ```
+
+> ⚠️ الموديل الحالي فيه **شامفر 2.4 مم** حوالين فتحة الضهر، فالفتحة بتبقى
+> 148.23 × 175.40 مش 153.04 × 177.80. لو مش عايز الشامفر ده، شيله من الأول —
+> لأنه هو اللي بيحدد مقاس الكفر.
 
 ### الخطوة 2 — الحواف
 ```
@@ -111,14 +125,17 @@ Fillet → 2 mm على الحواف العلوية
 
 | الفتحة | المكان | المقاس |
 |---|---|---|
-| شاشة TFT | فوق شمال | **52 × 40** مستطيل بحواف 2 مم |
-| زر Start | فوق يمين | **12 مم** |
-| Buzzer | فوق وسط | **12 مم** |
-| Toggle ×4 | صف النص على x = 55 / 90 / 125 / 160 | **6.2 مم** |
-| LED ×4 | فوق كل مفتاح بـ 10 مم | **5.2 مم** |
-| Cable LED | فوق الأسلاك يمين | **10.2 مم** |
-| Banana Jack ×8 | تحت، 2 صف × 4 عمود | **قِس المقبس + 0.3 مم** |
-| USB | جنب فوق | **12 × 8** مع recess 2 مم |
+| شاشة TFT | فوق | **48.9 × 36.7** (الزجاج). الموديل الحالي فيه **61 × 45.7** — كبير أوي |
+| زر Start | فوق يمين | **12 مم** — بس مفيش زر في الـ BOM |
+| Buzzer | فوق وسط | **6 × Ø2.0** (شبكة ثقوب مش فتحة كبيرة) |
+| Toggle ×4 | صف | **Ø6.2** (MTS-203 ميني) + مجرى مانع للفّ |
+| LED ×5 | فوق كل مفتاح / جنب كل مقبس | **Ø5.1** (1 RGB + 4 خضر) |
+| Banana Jack ×8 | تحت، 2 صف × 4 | **Ø8.2** (المقبس Ø8.0 + 0.2 للطباعة) |
+| USB | جنب | **9 × 4** مع شامفر 1 مم |
+
+> 🚨 **الموديل الحالي مش مطابق:** فيه 18 فتحة Ø8.0 على شبكة بوصة (25.40 مم)
+> + مربع 61 × 45.7. مفيش فيه فتحات Ø6.2 ولا Ø5.1 ولا Ø12.2. راجع §1.4 في
+> `hardware/MECHANICAL.md` قبل ما تقطع.
 
 > 💡 **اختبار قبل الطباعة:** اطبع لوح صغير 40×40 فيه فتحات 8 / 9 / 10 / 11 مم، وجرّب المقبس الحقيقي فيه. ده بيوفر عليك طباعة علبة كاملة غلط.
 
@@ -175,35 +192,43 @@ PLA — طبقة 0.2 مم — جدران 3 — تعبئة 20%
 
 ### ملفات المشروع
 ```
-src\main.cpp          ← البرنامج الرئيسي
-lib\buzzer\           ← مكتبة الصوت
-lib\cable\            ← وحدة الأسلاك
-lib\switch_module\    ← وحدة المفاتيح
-include\config.h      ← أرقام الأطراف
+src\main.cpp          ← كل حاجة: الأطراف، الحالة، الشاشة، الصوت، اللعبة
+platformio.ini        ← إعداد TFT_eSPI كله هنا (build_flags) — مفيش User_Setup.h
 ```
 
-### أرقام الأطراف (config.h)
+> الأطراف معرّفة في أول `src/main.cpp` — مفيش `config.h` منفصل.
+> فكرة الـ `lib/` اتلغت: المشروع كله ملف واحد، وهو أنضف لحاجة بالحجم ده.
+
+### أرقام الأطراف (الحقيقية من الكود)
 ```cpp
-#define JACK_1 13
-#define JACK_2 14
-#define JACK_3 16
-#define JACK_4 17
-#define BUZZER 18
-#define CABLE_LED_R 25
-#define CABLE_LED_G 26
-#define CABLE_LED_B 27
-#define START_BTN 4
-#define TFT_CS 5
-#define TFT_DC 2
-#define TFT_RST 15
+#define PIN_JACK1   13
+#define PIN_JACK2   14
+#define PIN_JACK3   16
+#define PIN_JACK4   17
+
+#define PIN_BUZZER  32      // كان 18 — 18 بقى VSPI SCK للشاشة
+#define PIN_START   33
+
+#define PIN_LAMP_R  25      // اللمبة الكبيرة (RGB)
+#define PIN_LAMP_G  26
+#define PIN_LAMP_B  27
+
+#define PIN_SOCK1    4      // مؤشرات المقابس
+#define PIN_SOCK2   21
+#define PIN_SOCK3   22
+#define PIN_SOCK4   12      // strapping — لازم يفضل LOW وقت البوت
+
+// الشاشة: CS 5 · DC 2 · RST ملغي (3V3)
+// MOSI 23 · MISO 19 · SCK 18 · BL 3V3
 ```
 
 ### البازر على Arduino Core 2.x (espressif32 6.12.0)
 ```cpp
-ledcSetup(0, 2000, 8);     // channel, freq, resolution
-ledcAttachPin(18, 0);      // pin, channel
-ledcWriteTone(0, 440);     // نغمة
-ledcWriteTone(0, 0);       // سكوت
+ledcAttach(PIN_BUZZER, 2000, 8);   // pin, freq, resolution (core 3.x)
+// أو على core 2.x:
+ledcSetup(0, 2000, 8);
+ledcAttachPin(PIN_BUZZER, 0);
+ledcWriteTone(PIN_BUZZER, 440);
 ```
 
 ### البناء
@@ -219,28 +244,25 @@ ledcWriteTone(0, 0);       // سكوت
 Boombanana_IRL/
 ├── README.md
 ├── BOM.csv
+├── JOURNAL.md
+├── PLAN.md
 ├── LICENSE
 ├── build.bat
 ├── platformio.ini
 ├── src/
 │   └── main.cpp
-├── include/
 ├── hardware/
-│   ├── schematic.pdf
-│   ├── wiring.png
-│   └── boombanana.kicad_sch
-├── case/
-│   ├── case.stl
-│   └── case-screenshot.png
-├── manual/
-│   ├── manual.pdf
-│   └── pages/*.jpg
-├── images/
-│   ├── paper-prototype.jpg
-│   └── final-build.jpg
-└── docs/
-    └── game-design.md
+│   ├── MECHANICAL.md          ← كل المقاسات والفتحات
+│   └── cad/
+│       ├── case_shell_v1.stl
+│       └── case_cover_v0_stub.stl   ← 12 مثلث، مش كفر حقيقي
+└── images/
+    ├── paper-prototype.jpg
+    └── case-design.png
 ```
+
+**اتشال من الريبو:** `diagram.json` و `wokwi.toml` و `libraries.txt` — كانوا
+لنسخة SSD1306 القديمة والأطراف فيها غلط. مفيش فايدة منهم وبيضللوا المراجع.
 
 ---
 
@@ -276,10 +298,11 @@ Boombanana_IRL/
 
 | القرار | الحالة |
 |---|---|
-| الشاشة: 2.4" TFT ILI9341 | 🔒 مقفول |
-| المقابس: 8 (4 أزواج) | 🔒 مقفول |
-| اللمبات: 5 RGB | 🔒 مقفول |
-| المقاس: 200 × 140 × 45 | 🔒 مقفول |
+| الشاشة: 2.4" TFT ILI9341 (SPI, بدون لمس) | 🔒 مقفول |
+| المقابس: 8 (4 أزواج JS-910B) | 🔒 مقفول |
+| اللمبات: 1 RGB كبيرة + 4 خضر (مش WS2812B) | 🔒 مقفول |
+| المقاس: 153.04 × 177.80 × 63.86 (من الموديل) | 🔒 مقفول |
+| الشكل: حوض + كفر مسطّح، مش شلين | 🔒 مقفول |
 | الأرقام: نقاط بارزة ثابتة | 🔒 مقفول |
 | الألوان: عشوائي بالكود | 🔒 مقفول |
 | مفيش PCB في v1 | 🔒 مقفول |

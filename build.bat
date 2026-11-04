@@ -1,6 +1,6 @@
 @echo off
 title BOMBANANA IRL - Build
-cd /d D:\hack-club-projects
+cd /d "%~dp0"
 
 set PIO=%USERPROFILE%\.platformio\penv\Scripts\python.exe
 
