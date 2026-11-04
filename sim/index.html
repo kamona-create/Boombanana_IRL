@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BOMBANANA IRL — المحاكي</title>
+<style>
+  :root{
+    --bg:#0b0e13; --panel:#161b22; --panel2:#1d232c; --line:#2b333f;
+    --txt:#e6edf3; --dim:#8b949e; --green:#3fb950; --red:#f85149; --yellow:#d29922;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:radial-gradient(1100px 600px at 50% -10%,#161d27,#0b0e13 60%);
+    color:var(--txt); font-family:"Segoe UI",Tahoma,sans-serif; direction:rtl;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:26px 20px 60px;display:grid;
+        grid-template-columns:minmax(340px,520px) 1fr;gap:26px;align-items:start}
+  @media(max-width:900px){.wrap{grid-template-columns:1fr}}
+
+  /* ---------- device ---------- */
+  .device{
+    position:relative; background:linear-gradient(180deg,#232a34,#151a21 55%,#11151b);
+    border:1px solid #2c3540; border-radius:24px; padding:20px 20px 22px;
+    box-shadow:0 40px 70px -35px #000, inset 0 1px 0 #3a4552;
+  }
+  .device::before,.device::after{
+    content:"";position:absolute;width:9px;height:9px;border-radius:50%;
+    background:radial-gradient(circle at 35% 35%,#5a646f,#1a1f26 70%);
+    box-shadow:inset 0 0 2px #000;
+  }
+  .device::before{top:12px;left:12px}
+  .device::after{top:12px;right:12px}
+
+  .toprow{display:flex;align-items:center;justify-content:space-between;margin:6px 2px 14px}
+  .lampwrap{display:flex;align-items:center;gap:10px}
+  .lamp{
+    width:46px;height:46px;border-radius:50%;background:#0d1014;
+    border:2px solid #333c48; box-shadow:inset 0 0 10px #000;
+    transition:background .08s linear, box-shadow .08s linear;
+  }
+  .lampwrap span{font-size:10px;letter-spacing:.16em;color:var(--dim)}
+  .leds{display:flex;gap:12px}
+  .led{
+    width:15px;height:15px;border-radius:50%;background:#182018;
+    border:1px solid #2a362a; box-shadow:inset 0 0 4px #000;
+    transition:background .06s linear, box-shadow .06s linear;
+  }
+  .led.on{background:#3fe06a;border-color:#3fe06a;
+          box-shadow:0 0 10px #3fe06a,0 0 26px rgba(63,224,106,.45)}
+
+  .screen{background:#05070a;border:1px solid #2c3540;border-radius:12px;padding:9px;
+          box-shadow:inset 0 0 20px #000}
+  #tft{width:100%;height:auto;display:block;border-radius:6px;background:#000}
+
+  /* ---------- jacks ---------- */
+  .jacks{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+  .jackpair{
+    position:relative;background:#10151b;border:1px solid #232c36;border-radius:10px;
+    padding:20px 8px 8px;cursor:pointer;user-select:none;transition:.12s;
+  }
+  .jackpair:hover{border-color:#3d4a59;background:#131922}
+  .jackpair .jnum{
+    position:absolute;top:2px;right:7px;font:700 11px/1 "Courier New",monospace;color:#5f6b7a
+  }
+  .cord{display:flex;align-items:center;height:30px}
+  .plug{width:17px;height:17px;border-radius:4px;flex:0 0 auto;transition:.14s}
+  .plug.red{background:linear-gradient(160deg,#ff5c5c,#b81f24);box-shadow:inset 0 -2px 3px rgba(0,0,0,.4)}
+  .plug.black{background:linear-gradient(160deg,#3a3f46,#101317);box-shadow:inset 0 -2px 3px rgba(0,0,0,.5)}
+  .cable{flex:1;height:5px;border-radius:3px;background:#586374;transition:.14s}
+  .jackpair.pulled .cable{background:#232b35}
+  .jackpair.pulled .plug.red{transform:translateY(-13px) rotate(-28deg)}
+  .jackpair.pulled .jnum{color:var(--yellow)}
+  .jacks.disabled{opacity:.4;pointer-events:none}
+
+  /* ---------- switches ---------- */
+  .switchrow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+  .sw{
+    position:relative;height:66px;background:#10151b;border:1px solid #232c36;
+    border-radius:10px;cursor:pointer;user-select:none;transition:.12s
+  }
+  .sw:hover{border-color:#3d4a59}
+  .lever{
+    position:absolute;left:50%;transform:translateX(-50%);width:11px;height:25px;
+    border-radius:6px;background:linear-gradient(180deg,#c9d1d9,#6e7681);
+    box-shadow:0 2px 4px rgba(0,0,0,.6);transition:top .11s ease, bottom .11s ease;
+  }
+  .sw.up .lever{top:7px}
+  .sw.dn .lever{bottom:7px;background:linear-gradient(180deg,#8b949e,#4b535d)}
+  .swlabel{position:absolute;bottom:4px;left:0;right:0;text-align:center;
+           font:600 9px/1 "Courier New",monospace;color:#5f6b7a;letter-spacing:.1em}
+  .switchrow.disabled{opacity:.4;pointer-events:none}
+
+  .start{
+    width:100%;margin-top:14px;padding:13px;border-radius:12px;cursor:pointer;
+    border:1px solid #2f6f3a;background:linear-gradient(180deg,#1f8a3d,#14602a);
+    color:#eafff0;font:800 15px/1 "Segoe UI",Tahoma,sans-serif;letter-spacing:.14em;
+    box-shadow:0 6px 18px -8px #000, inset 0 1px 0 rgba(255,255,255,.25);
+    transition:.12s
+  }
+  .start:hover{filter:brightness(1.12)}
+  .start:active{transform:translateY(1px)}
+
+  /* ---------- sidebar ---------- */
+  h1{font-size:22px;margin:0 0 4px;letter-spacing:.02em}
+  h1 span{font-size:12px;font-weight:400;color:var(--dim);letter-spacing:.2em;
+          border:1px solid var(--line);border-radius:999px;padding:3px 9px;margin-right:8px;vertical-align:middle}
+  .sub{color:var(--dim);font-size:13px;line-height:1.7;margin:0 0 16px}
+  .sub code{background:#1b2129;border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:12px}
+
+  .hud{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+  .hud>div{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 8px;text-align:center}
+  .hud span{display:block;font-size:10px;color:var(--dim);letter-spacing:.08em;margin-bottom:3px}
+  .hud b{font:700 14px/1.2 "Courier New",monospace}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+  .card h2{font-size:13px;margin:0 0 8px;letter-spacing:.08em;color:#b8c4d4;font-weight:700}
+  .card p,.card li{font-size:13px;line-height:1.75;color:#c3cdd9;margin:0}
+  .card ul{margin:0;padding-right:18px}
+  details.card summary{cursor:pointer;font-size:13px;font-weight:700;color:#b8c4d4;list-style:none}
+  details.card summary::-webkit-details-marker{display:none}
+  details.card summary::before{content:"▸ ";color:var(--dim)}
+  details.card[open] summary::before{content:"▾ "}
+  details.card .body{margin-top:10px}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
+  th,td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:right}
+  th{color:var(--dim);font-weight:600}
+  kbd{background:#1b2129;border:1px solid #333c48;border-bottom-width:2px;border-radius:5px;
+      padding:1px 6px;font:600 11px/1.6 "Courier New",monospace;color:#dbe4ee}
+  .warn{border-color:#5a4a1f;background:#1e1a12}
+  .warn p{color:#e3c98a}
+  .toolbar{display:flex;gap:8px;margin-bottom:14px}
+  .toolbar button{flex:1;padding:9px;border-radius:9px;border:1px solid var(--line);
+                  background:var(--panel2);color:#c9d3df;font-size:12px;cursor:pointer}
+  .toolbar button:hover{border-color:#3d4a59}
+  #dev{font:12px/1.8 "Courier New",monospace;color:#9fb0c3;white-space:pre-wrap;direction:ltr;text-align:left}
+  .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#3fb950;margin-left:5px;vertical-align:middle}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ================= DEVICE ================= -->
+  <div class="device">
+    <div class="toprow">
+      <div class="lampwrap"><div class="lamp" id="lamp"></div><span>LAMP</span></div>
+      <div class="leds" id="leds"></div>
+    </div>
+
+    <div class="screen"><canvas id="tft" width="640" height="480"></canvas></div>
+
+    <div class="jacks" id="jacks"></div>
+    <div class="switchrow" id="switchrow"></div>
+
+    <button class="start" id="startBtn">START</button>
+  </div>
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside>
+    <h1>BOMBANANA IRL <span>محاكي</span></h1>
+    <p class="sub">
+      نفس منطق <code>src/main.cpp</code> بالحرف: 5 جولات، منها 2 سويتش، عشوائية كل لعبة،
+      3 strikes، و150 ثانية. هذا محاكي <b>منطق</b> — مو تصميم الكيس.
+    </p>
+
+    <div class="hud">
+      <div><span>الجولة</span><b id="hRound">—</b></div>
+      <div><span>النوع</span><b id="hType">—</b></div>
+      <div><span>الوقت</span><b id="hTime">—</b></div>
+      <div><span>STRIKES</span><b id="hStrikes">—</b></div>
+    </div>
+
+    <div class="toolbar">
+      <button id="soundBtn">🔊 الصوت: شغّال</button>
+      <button id="replugBtn">إعادة توصيل كل الأسلاك</button>
+    </div>
+
+    <div class="card">
+      <h2>كيف تشتغل اللعبة</h2>
+      <ul>
+        <li><b>الجولة الكيبل:</b> اللمبة الكبيرة تولّع لون. عدد الأسلاك يظهر على الشاشة. اللاعب الأخرس يقرأ الدليل ويقول أي سلك، الأعمى يشدّه.</li>
+        <li><b>الجولة السويتش:</b> الشاشة تبيّن UP/DN لكل مفتاح، واللمبات الخضراء تولّع للمفتاح الصح. لازم النمط يثبت <b>نص ثانية</b>.</li>
+        <li><b>غلط في الكيبل = strike.</b> ثالث strike = BOOM. جولة السويتش ما تعطي strike — الوقت هو الضغط.</li>
+      </ul>
+    </div>
+
+    <details class="card">
+      <summary>دليل اللاعب الأخرس (فيه حرق)</summary>
+      <div class="body">
+        <p>نفس الجدولين اللي في الفيرموير بالحرف — لو غيّرت واحد لازم تغيّر الثاني:</p>
+        <table>
+          <tr><th>عدد الأسلاك</th><th>RED</th><th>GREEN</th><th>BLUE</th></tr>
+          <tr><td>3</td><td>الثالث</td><td>الأول</td><td>الثاني</td></tr>
+          <tr><td>4</td><td>الرابع</td><td>الثالث</td><td>الثاني</td></tr>
+        </table>
+        <p style="margin-top:10px;color:#8b949e">مكتوبة في الكود كـ <code>TABLE_3 = {2,0,1}</code> و <code>TABLE_4 = {3,2,1}</code>.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary>وضع المطور (حرق كامل)</summary>
+      <div class="body"><div id="dev">—</div></div>
+    </details>
+
+    <div class="card">
+      <h2>التحكم من الكيبورد</h2>
+      <p><kbd>1</kbd>–<kbd>4</kbd> شد / رجّع السلك · <kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd><kbd>R</kbd> اقلب السويتشات · <kbd>Space</kbd> ابدأ</p>
+    </div>
+
+    <div class="card warn">
+      <p>
+        <b>الفرق عن الحقيقي:</b> هنا الأسلاك مرقّمة 1–4 واللمبات كلها على شاشة.
+        في الجهاز الحقيقي السلك ملموس، واللمبة لون فقط، والأعمى ما يشوفش الشاشة —
+        عشان كذا الأدوار الثلاثة لازم بشر.
+      </p>
+    </div>
+  </aside>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------------- constants (mirror src/main.cpp) ---------------- */
+const GAME_SECONDS   = 150;
+const TOTAL_ROUNDS   = 5;
+const SWITCH_ROUNDS  = 2;
+const MAX_STRIKES    = 3;
+const SWITCH_HOLD_MS = 500;
+
+const TABLES = { 3:[2,0,1], 4:[3,2,1] };
+const COLOR_NAME = ['RED','GREEN','BLUE'];
+const RGB = [[255,0,0],[0,200,0],[0,0,255]];
+
+/* TFT_eSPI colours */
+const C = {
+  WHITE:'#ffffff', DARKGREY:'#7b7b7b', RED:'#f80000',
+  GREEN:'#00e000', ORANGE:'#fd9f00', YELLOW:'#ffe000'
+};
+
+/* ---------------- canvas ---------------- */
+const cvs = document.getElementById('tft');
+const ctx = cvs.getContext('2d');
+ctx.scale(2,2);                        // draw in 320x240, canvas is 640x480
+
+/* ---------------- state (mirror the firmware globals) ---------------- */
+const G = {
+  state:'IDLE', plan:[], roundIsSwitch:false, roundNo:0, strikes:0,
+  startAt:0, remaining:GAME_SECONDS, lastSec:-1,
+  wireCount:3, colorIdx:0, targetWire:0, armed:false,
+  sw:[true,true,true,true], swTarget:0, swHolding:false, swHoldStart:0
+};
+const plugged = [true,true,true,true];
+
+/* ---------------- helpers ---------------- */
+const rnd = n => Math.floor(Math.random()*n);
+const bit = (v,i) => (v>>i)&1;
+function swBits(){ let b=0; for(let i=0;i<4;i++) if(G.sw[i]) b |= (1<<i); return b; }
+function fmt(s){ s=Math.max(0,s); return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
+
+/* ---------------- audio ---------------- */
+let actx = null, soundOn = true;
+function ensureAudio(){
+  if(!soundOn) return;
+  if(!actx){
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return;
+    actx = new AC();
+  }
+  if(actx.state === 'suspended') actx.resume();
+}
+function tone(freq,ms,vol,type,delay){
+  if(!soundOn) return;
+  ensureAudio(); if(!actx) return;
+  const t0 = actx.currentTime + (delay||0);
+  const o = actx.createOscillator(), g = actx.createGain();
+  o.type = type || 'square';
+  o.frequency.setValueAtTime(freq, t0);
+  const v = (vol==null) ? 0.035 : vol;
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(v, t0+0.008);
+  g.gain.setValueAtTime(v, t0 + Math.max(0.012, ms/1000 - 0.012));
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + ms/1000);
+  o.connect(g); g.connect(actx.destination);
+  o.start(t0); o.stop(t0 + ms/1000 + 0.03);
+}
+const beep = (f,ms) => tone(f,ms);
+
+function sStart(){ tone(660,120,.04,'square',0); tone(880,120,.04,'square',.13); tone(1320,160,.04,'square',.26); }
+function sGood(){  tone(1046,90,.04); tone(1318,120,.04,'square',.09); }
+function sStrike(){ tone(150,500,.06,'sawtooth'); }
+function sWin(){  [523,659,784].forEach((f,i)=>tone(f,140,.045,'square',i*.15)); tone(1046,400,.045,'square',.45); }
+function sBoom(){ if(!soundOn) return; for(let i=0;i<36;i++) tone(800-i*20,60,.05,'sawtooth',i*.02); }
+function sTick(rem){ tone(rem>60?2000:rem>20?2200:2600, rem>60?8:rem>20?10:12, .018); }
+function sClick(){ tone(700,22,.02); }
+
+/* ---------------- game logic (mirror) ---------------- */
+function buildPlan(){
+  G.plan = [];
+  for(let i=0;i<TOTAL_ROUNDS;i++) G.plan.push(i < SWITCH_ROUNDS ? 'S' : 'C');
+  for(let i=TOTAL_ROUNDS-1;i>0;i--){
+    const j = rnd(i+1);
+    const t = G.plan[i]; G.plan[i] = G.plan[j]; G.plan[j] = t;
+  }
+}
+
+function newCableRound(){
+  G.wireCount  = rnd(2)===0 ? 3 : 4;
+  G.colorIdx   = rnd(3);
+  G.targetWire = TABLES[G.wireCount][G.colorIdx];
+  G.armed      = false;
+}
+
+function newSwitchRound(){
+  let t;
+  do { t = 1 + rnd(15); } while(t === 15);   // 0b0000 and 0b1111 are not puzzles
+  G.swTarget  = t;
+  G.armed     = false;
+  G.swHolding = false;
+}
+
+function nextRound(){
+  if(G.roundNo >= TOTAL_ROUNDS){ gameWin(); return; }
+  G.roundIsSwitch = (G.plan[G.roundNo] === 'S');
+  G.swHolding = false;
+  if(G.roundIsSwitch) newSwitchRound();
+  else                newCableRound();
+}
+
+function startGame(){
+  ensureAudio();
+  G.strikes  = 0;
+  G.roundNo  = 0;
+  G.startAt  = performance.now();
+  G.remaining = GAME_SECONDS;
+  G.lastSec  = -1;
+  G.state    = 'RUNNING';
+  for(let i=0;i<4;i++) plugged[i] = true;
+  buildPlan();
+  nextRound();
+  sStart();
+}
+
+function gameOver(){ G.state='BOOM'; sBoom(); }
+function gameWin(){  G.state='WIN';  sWin();  }
+
+function handleCut(i){
+  if(i === G.targetWire){
+    G.roundNo++;
+    if(G.roundNo >= TOTAL_ROUNDS){ gameWin(); return; }
+    sGood(); nextRound();
+  } else {
+    G.strikes++;
+    sStrike();
+    if(G.strikes >= MAX_STRIKES){ gameOver(); return; }
+    nextRound();
+  }
+}
+
+/* ---------------- input ---------------- */
+function pullWire(i){
+  if(G.state !== 'RUNNING' || G.roundIsSwitch) return;
+  if(!plugged[i]){ plugged[i] = true; sClick(); return; }   // replug
+  plugged[i] = false;
+  sClick();
+  if(G.armed && i < G.wireCount) handleCut(i);
+}
+
+function flipSwitch(i){
+  if(G.state !== 'RUNNING' || !G.roundIsSwitch) return;
+  G.sw[i] = !G.sw[i];
+  G.swHolding = false;      // a new throw restarts the 500 ms hold
+  sClick();
+}
+
+/* ---------------- panel DOM ---------------- */
+const jacksEl   = document.getElementById('jacks');
+const switchesEl= document.getElementById('switchrow');
+const ledsEl    = document.getElementById('leds');
+const lampEl    = document.getElementById('lamp');
+const startBtn  = document.getElementById('startBtn');
+
+jacksEl.innerHTML = [0,1,2,3].map(i => `
+  <div class="jackpair" data-i="${i}">
+    <div class="jnum">${i+1}</div>
+    <div class="cord">
+      <div class="plug red"></div><div class="cable"></div><div class="plug black"></div>
+    </div>
+  </div>`).join('');
+
+switchesEl.innerHTML = [0,1,2,3].map(i => `
+  <div class="sw up" data-i="${i}">
+    <div class="lever"></div><div class="swlabel">SW ${i+1}</div>
+  </div>`).join('');
+
+ledsEl.innerHTML = [0,1,2,3].map(() => '<div class="led"></div>').join('');
+
+const jackEls   = Array.from(jacksEl.children);
+const switchEls = Array.from(switchesEl.children);
+const sockEls   = Array.from(ledsEl.children);
+
+jacksEl.addEventListener('click', e => {
+  const el = e.target.closest('.jackpair');
+  if(el) pullWire(+el.dataset.i);
+});
+switchesEl.addEventListener('click', e => {
+  const el = e.target.closest('.sw');
+  if(el) flipSwitch(+el.dataset.i);
+});
+startBtn.addEventListener('click', () => {
+  ensureAudio();
+  if(G.state === 'IDLE' || G.state === 'BOOM' || G.state === 'WIN') startGame();
+});
+document.getElementById('replugBtn').addEventListener('click', () => {
+  for(let i=0;i<4;i++) plugged[i] = true;
+  sClick();
+});
+const soundBtn = document.getElementById('soundBtn');
+soundBtn.addEventListener('click', () => {
+  soundOn = !soundOn;
+  soundBtn.textContent = soundOn ? '🔊 الصوت: شغّال' : '🔇 الصوت: مقفول';
+  if(soundOn){ ensureAudio(); sClick(); }
+});
+
+window.addEventListener('keydown', e => {
+  if(e.repeat) return;
+  const k = e.key.toLowerCase();
+  if(e.code === 'Space'){
+    e.preventDefault();
+    if(G.state !== 'RUNNING'){ ensureAudio(); startGame(); }
+    return;
+  }
+  if(k.length === 1 && '1234'.includes(k)){ pullWire(+k - 1); return; }
+  const idx = 'qwer'.indexOf(k);
+  if(idx >= 0) flipSwitch(idx);
+});
+
+/* ---------------- rendering ---------------- */
+function text(s,x,y,size,color,align,base){
+  ctx.fillStyle = color;
+  ctx.font = 'bold ' + size + 'px "Courier New",Consolas,monospace';
+  ctx.textAlign = align || 'left';
+  ctx.textBaseline = base || 'top';
+  ctx.fillText(s,x,y);
+}
+
+function render(){
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0,0,320,240);
+
+  if(G.state === 'IDLE'){
+    text('BOMBANANA IRL',160,50,26,C.WHITE,'center','middle');
+    text('READY',160,110,48,C.WHITE,'center','middle');
+    text('3 players  /  150 seconds',160,175,16,C.WHITE,'center','middle');
+    text('PRESS START',160,210,16,C.GREEN,'center','middle');
+    return;
+  }
+
+  if(G.state === 'BOOM' || G.state === 'WIN'){
+    const win = (G.state === 'WIN');
+    text(win ? 'DEFUSED' : 'BOOM!',160,100,48,win?C.GREEN:C.RED,'center','middle');
+    text(win ? 'You saved the day' : 'The bomb exploded',160,165,16,C.WHITE,'center','middle');
+    text('PRESS START',160,200,16,C.GREEN,'center','middle');
+    return;
+  }
+
+  /* ---- running ---- */
+  text('BOMBANANA IRL',8,8,16,C.DARKGREY);
+
+  let st = '';
+  for(let i=0;i<MAX_STRIKES;i++) st += (i < G.strikes) ? 'X' : '-';
+  text(st,312,8,16,G.strikes?C.RED:C.DARKGREY,'right');
+
+  text(fmt(G.remaining),160,115,48, G.remaining<=20?C.RED:C.WHITE,'center','middle');
+
+  if(G.roundIsSwitch){
+    text('SWITCH '+(G.roundNo+1)+'/'+TOTAL_ROUNDS,8,155,16,C.WHITE);
+
+    let matched = 0;
+    const sb = swBits();
+    for(let i=0;i<4;i++) if(bit(sb,i) === bit(G.swTarget,i)) matched++;
+    text('MATCH '+matched+'/4',312,155,16, matched===4?C.GREEN:C.YELLOW,'right');
+
+    for(let i=0;i<4;i++){
+      const x = 8 + i*78;
+      const up = G.sw[i];
+      const ok = (bit(sb,i) === bit(G.swTarget,i));
+      const col = ok ? C.GREEN : C.ORANGE;
+      ctx.strokeStyle = col;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x+1,184,68,44);
+      text(up?'UP':'DN', x+35, 206, 26, col, 'center','middle');
+    }
+  } else {
+    text('CABLE '+(G.roundNo+1)+'/'+TOTAL_ROUNDS,8,158,16,C.WHITE);
+    text('WIRES: '+G.wireCount,312,158,16,C.WHITE,'right');
+    text('LAMP: '+COLOR_NAME[G.colorIdx],8,188,16,C.YELLOW);
+    text(G.armed?'PULL ONE WIRE':'PLUG ALL WIRES',312,188,16,
+         G.armed?C.GREEN:C.ORANGE,'right');
+  }
+}
+
+function syncPanel(){
+  let lamp = [0,0,0];
+  const socks = [false,false,false,false];
+
+  if(G.state === 'BOOM'){
+    lamp = [255,0,0]; socks.fill(true);
+  } else if(G.state === 'WIN'){
+    lamp = [0,200,0]; socks.fill(true);
+  } else if(G.state === 'RUNNING'){
+    if(G.roundIsSwitch){
+      const sb = swBits();
+      for(let i=0;i<4;i++) socks[i] = (bit(sb,i) === bit(G.swTarget,i));
+    } else {
+      lamp = RGB[G.colorIdx];
+      for(let i=0;i<4;i++) socks[i] = plugged[i] && i < G.wireCount;
+    }
+  }
+
+  const on = lamp[0]||lamp[1]||lamp[2];
+  lampEl.style.background = on ? 'rgb('+lamp.join(',')+')' : '#0d1014';
+  lampEl.style.boxShadow  = on
+    ? '0 0 22px rgba('+lamp.join(',')+',.9), 0 0 60px rgba('+lamp.join(',')+',.35)'
+    : 'inset 0 0 10px #000';
+
+  sockEls.forEach((el,i) => el.classList.toggle('on', socks[i]));
+  jackEls.forEach((el,i) => el.classList.toggle('pulled', !plugged[i]));
+  switchEls.forEach((el,i) => {
+    el.classList.toggle('up', G.sw[i]);
+    el.classList.toggle('dn', !G.sw[i]);
+  });
+
+  jacksEl.classList.toggle('disabled', G.state!=='RUNNING' || G.roundIsSwitch);
+  switchesEl.classList.toggle('disabled', !(G.state==='RUNNING' && G.roundIsSwitch));
+
+  startBtn.textContent = (G.state==='BOOM'||G.state==='WIN') ? 'RESTART' : 'START';
+
+  /* HUD */
+  document.getElementById('hRound').textContent =
+    (G.state==='IDLE') ? '—' : Math.min(G.roundNo+1, TOTAL_ROUNDS)+'/'+TOTAL_ROUNDS;
+  document.getElementById('hType').textContent =
+    (G.state==='IDLE') ? '—' : (G.roundIsSwitch ? 'سويتش' : 'كيبل');
+  document.getElementById('hTime').textContent =
+    (G.state==='RUNNING') ? fmt(G.remaining) : '—';
+  document.getElementById('hStrikes').textContent =
+    (G.state==='IDLE') ? '—' : G.strikes+'/'+MAX_STRIKES;
+
+  document.getElementById('dev').textContent = [
+    'state      : ' + G.state,
+    'plan       : ' + G.plan.join(' '),
+    'round      : ' + (G.roundNo+1) + ' / ' + TOTAL_ROUNDS + '  (' + (G.roundIsSwitch?'switch':'cable') + ')',
+    'armed      : ' + G.armed,
+    'plugged    : ' + plugged.map(b=>b?1:0).join(''),
+    'wireCount  : ' + G.wireCount,
+    'lamp       : ' + COLOR_NAME[G.colorIdx],
+    'targetWire : ' + (G.targetWire+1),
+    'swTarget   : ' + G.swTarget.toString(2).padStart(4,'0'),
+    'swState    : ' + swBits().toString(2).padStart(4,'0'),
+    'holding    : ' + G.swHolding
+  ].join('\n');
+}
+
+/* ---------------- main loop ---------------- */
+function loop(now){
+  if(G.state === 'RUNNING'){
+    const remaining = GAME_SECONDS - Math.floor((now - G.startAt)/1000);
+    G.remaining = Math.max(0, remaining);
+
+    if(remaining <= 0){
+      gameOver();
+    } else {
+      if(remaining !== G.lastSec){
+        G.lastSec = remaining;
+        sTick(remaining);
+      }
+
+      if(!G.roundIsSwitch){
+        if(!G.armed && plugged.every(Boolean)) G.armed = true;
+      } else {
+        if(swBits() === G.swTarget){
+          if(!G.swHolding){
+            G.swHolding  = true;
+            G.swHoldStart = now;
+          } else if(now - G.swHoldStart >= SWITCH_HOLD_MS){
+            G.swHolding = false;
+            G.roundNo++;
+            if(G.roundNo >= TOTAL_ROUNDS){
+              gameWin();
+            } else {
+              sGood();
+              nextRound();
+            }
+          }
+        } else {
+          G.swHolding = false;
+        }
+      }
+    }
+  }
+
+  render();
+  syncPanel();
+  requestAnimationFrame(loop);
+}
+
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

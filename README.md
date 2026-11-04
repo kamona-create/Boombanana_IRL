@@ -68,9 +68,11 @@ whole game.
 | Passive buzzer module | 1 | must be **passive** — active ones can't play tones |
 | Perfboard 8 × 12 cm | 1 | all wiring lives here, no PCB in v1 |
 | JST-XH connectors | — | modules plug in, nothing is soldered to the case |
+| Start button (momentary, 12mm) | 1 | GPIO 33 — without it the game cannot start |
+| Resistor 1k + capacitor 100nF (×4 each) | 8 | ESD protection on the jack signal lines |
 
 Full bill of materials with prices and purchase links:
-**[`BOM.csv`](BOM.csv)** — total **$161.40** including tools.
+**[`BOM.csv`](BOM.csv)** — total **$175.23** including tools.
 
 Every dimension, hole and tolerance:
 **[`hardware/MECHANICAL.md`](hardware/MECHANICAL.md)**.

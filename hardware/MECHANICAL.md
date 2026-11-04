@@ -111,7 +111,7 @@ not uniform, so do not array it, place it.
 |---|---|---|---|
 | Banana jack | Ø8.00 × 18 | Ø8.20 × 8 | +0.2 for printing, delete 10 holes |
 | Screen window | 61.00 × 45.73 | 48.9 × 36.7 glass (60 × 42.5 module) | too big — the glass edge shows |
-| Toggle switch | — | Ø12.2 × 4 | missing |
+| Toggle switch | — | Ø6.2 + 1.5 keyway × 4 | wrong target in the old model (Ø12.2) — use Ø6.2 for MTS-102/MTS-203 or Ø12.2 only if full-size M12 |
 | Start button | — | Ø12.2 × 1 | missing |
 | LEDs (1 RGB + 4) | — | Ø5.1 × 5 | missing |
 | Buzzer | — | Ø2.0 × 6 | missing |
@@ -204,7 +204,7 @@ Notes:
 | Banana jack JS-910B | panel hole Ø8.0, cap Ø17, body behind panel 11–13, total length 33 | nut + washer behind the panel |
 | 4 mm banana plug (male, solder) | pin Ø4.0, total length 38, body Ø9.5 | plugs into the jack |
 | Toggle switch **MTS-203** (mini, 6-pin DPDT) | bushing **M6**, panel hole **Ø6.2**, body behind panel ~13, lever ~11 | nut + anti-rotation washer — **verify with calipers** |
-| ~~Push button 12 mm (start)~~ | **not in `BOM.csv` yet** — the firmware uses `PIN_START` 33 | needs a part before the panel can be cut |
+| Push button 12 mm (start) | momentary, normally open, panel nut mount (in `BOM.csv`: **Start Button**) | firmware reads it on GPIO 33 — `INPUT_PULLUP`, LOW = pressed |
 | 5 mm LED (1x RGB + 4x green) | body Ø5.0, height 6.0, legs on 2.54 pitch | press-fit into a Ø5.1 hole |
 | Passive buzzer module 5V | ~20 x 15 x 8 (the BOM part is the 3-pin PCB type) | 2x M2, or a printed ring |
 | Perfboard **8 x 12 cm** | 120.0 x 80.0 x 1.6, holes Ø1.0 on 2.54 pitch | 4x M3 holes at the corners, standoffs 16 mm (clears the jack tails) |
@@ -222,7 +222,7 @@ Add **2 mm** of clearance around every part that is not screwed down
 | 1 | Banana jack | Ø8.2 | 8 | front | 2 rows of 4. The cap is **Ø17**, so ≥20 mm between centres (the old model used 25.40 — one inch) |
 | 2 | Screen window | 48.9 x 36.7 | 1 | front | centre it; allow 4 mm of bezel overlap on each side so the glass is covered |
 | 3 | Screen screw bosses | Ø2.5 | 4 | front (inside) | bosses Ø5.0, height = 2.5 (module thickness) |
-| 4 | Start button | Ø12.2 | 1 | front | **blocked: no part in the BOM** — pick one first |
+| 4 | Start button | Ø12.2 | 1 | front | 12mm momentary push (in `BOM.csv`) — nut mount |
 | 5 | Toggle switches | Ø6.2 + 1.5 keyway | 4 | front | MTS-203 mini toggle; 25 mm between centres. Swap to Ø12.2 only if you buy full-size M12 toggles |
 | 6 | LED holes (1 RGB + 4 green) | Ø5.1 | 5 | front | 1 big lamp + 4 socket indicators; leave 1.2 mm between LED holes |
 | 7 | Buzzer grille | Ø2.0 | 6 | front | drill pattern instead of one big hole, keeps dust out |
