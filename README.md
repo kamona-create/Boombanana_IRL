@@ -123,6 +123,7 @@ src/main.cpp              firmware — game state machine, display, audio
 platformio.ini            board + TFT_eSPI pin configuration
 BOM.csv                   every part, price and link
 hardware/MECHANICAL.md    measured dimensions, hole table, lid spec
+hardware/MOUNTS.md        work order for the internal mounts
 hardware/cad/             STL exports
 JOURNAL.md                build log
 PLAN.md                   working plan (Arabic)

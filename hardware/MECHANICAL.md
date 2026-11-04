@@ -270,6 +270,11 @@ and it proves your tolerances are measured, not guessed.
 
 ## 8. Internal mounts — yes, every part needs one
 
+> **Execution order lives in [`MOUNTS.md`](MOUNTS.md).** That file turns this
+> section into a step-by-step work order with Onshape instructions and the
+> depth-budget check. Read `MOUNTS.md` §0 before modelling anything — the
+> default stack does not fit in 57.60 mm.
+
 Forge requirement, word for word: *"Have a concrete way to attach components
 (including electronics). Use screws, clips, etc. This is a product, not a demo,
 it should feel solid, and not held up by tape, glue, and dreams."*
