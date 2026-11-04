@@ -127,7 +127,10 @@ platformio.ini            board + TFT_eSPI pin configuration
 BOM.csv                   every part, price and link
 hardware/MECHANICAL.md    measured dimensions, hole table, lid spec
 hardware/MOUNTS.md        work order for the internal mounts
-hardware/cad/             STL exports
+hardware/WIRING.md        full wiring map (the diagram for the perfboard build)
+hardware/cad/             STL exports (tub is real, lid is not yet)
+docs/GAME-GUIDE.md        the player-facing manual (cable tables match the firmware)
+sim/index.html            browser simulator — runs the actual game logic
 JOURNAL.md                build log
 PLAN.md                   working plan (Arabic)
 ```
@@ -136,7 +139,6 @@ PLAN.md                   working plan (Arabic)
 
 ## Future work
 
-- Switch module firmware (4 toggles on the free input-only pins)
 - Custom PCB — v2, the perfboard is a v1 compromise
 - DFPlayer Mini for real voice lines and explosion audio
 - Direction and Calculation modules, to match the full game
