@@ -1,8 +1,10 @@
 # BOMBANANA IRL — Wiring Specification
 
-> The schematic (`hardware/schematic.pdf`) is the visual rendering of this
-> document. The PCB to build from is this document + the perfboard layout.
-> Do not invent pin assignments that are not listed here.
+> The circuit has no PCB (perfboard build), so this file is the wiring diagram
+> for the project. It is referenced by the README and used when you solder the
+> board. Do not invent pin assignments that are not listed here.
+>
+> KiCad was tried and dropped; this file is the documentation now.
 
 ## Power Tree
 
@@ -127,19 +129,17 @@ GND ───►| GND                                 │
         +----------------------------------------+
 ```
 
-## Doing it in KiCad (the checklist)
-1. Open/make project in `hardware/kicad/boombanana/`
-2. Place symbols listed above (connector + Device + Switch libraries)
-3. Assign values (`1k`, `10k`, `220R`) with right-click → Properties, or `E`
-4. Draw wires `W`, power symbols `P` (+3V3/GND), **one PWR_FLAG on each of 3V3 and GND**
-5. `Tools → Electrical Rules Check → Run ERC` — aim for 0 errors
-6. `File → Page Settings` — title BOMBANANA IRL + date
-7. `File → Plot` — PDF into `hardware/schematic.pdf`
-8. Commit + push; attach the PDF to the submission
+## Doing it by hand (the perfboard flow)
+1. Prototype on the breadboard first — no solder
+2. Check each connection against this document with a multimeter
+3. Copy the verified circuit to the perfboard
+4. Take a clear photo of the perfboard wiring and put it in the README
+   (that photo + this document is the "clear wiring diagram" Forge wants)
+5. Optional: if you ever do a PCB revision, KiCad + Gerbers from this document
 
-## Sanity checks before you ship the design
+## Sanity checks before you ship the build
 - [ ] Every jack has a 1 kΩ + 100 nF pair
 - [ ] Every switch has a 10 kΩ pull-up on its GPIO (34/35/36/39)
 - [ ] Every LED has its 220 Ω in series
-- [ ] No net left floating (check ERC list)
-- [ ] Every pin listed in this document appears somewhere in your schematic
+- [ ] No pin is left floating
+- [ ] Every pin listed in this document has been wired on the real board
