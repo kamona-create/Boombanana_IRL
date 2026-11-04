@@ -6,7 +6,7 @@ created_at: "2026-11-02"
 ---
 
 
-# November 2: Paper prototype and first plan
+# November 2: Paper prototype and first plan:
 
 I played a paper version of the game and it was exciting and wonderful,
 I also wanted to test the game before developing it to see if its really worth it, the paper version was boring because it needed to be with real interactions, so I spend the whole day drawing what the game will look like
@@ -24,3 +24,8 @@ Today I researched for the parts and check their prices, I also found a small to
 Parts list with live prices: [BOM.csv](BOM.csv)
 
 **Total time spent: 5h**
+
+# November 4: case adjustment and :
+I made some adjustment in my CAD so i can insert the components , also tried to build a schematic but im bad at designing circuts so i deleted the idea, also i made some changes on my code , Wish me good luck🙏🙏.
+
+**Total time spent: 4h**
