@@ -24,16 +24,19 @@
 #define PIN_START   33
 
 // Big lamp = one RGB LED. Sockets = one green LED each (plugged / cut).
+// 4 / 21 / 22 / 12 are the only normal GPIOs left after the TFT and the jacks.
+// GPIO12 is a strapping pin but the LED+resistor holds it LOW at boot, which is
+// exactly what the bootloader wants (3.3 V flash). GPIO15 stays unused.
 #define PIN_LAMP_R  25
 #define PIN_LAMP_G  26
 #define PIN_LAMP_B  27
 #define PIN_SOCK1    4
-#define PIN_SOCK2   12
-#define PIN_SOCK3   15
-#define PIN_SOCK4   21
+#define PIN_SOCK2   21
+#define PIN_SOCK3   22
+#define PIN_SOCK4   12
 
 // TFT (set in platformio.ini build_flags):
-//   MOSI 23 | MISO 19 | SCK 18 | CS 5 | DC 2 | RST 4 | BL -> 3V3
+//   MOSI 23 | MISO 19 | SCK 18 | CS 5 | DC 2 | RST -> 3V3 | BL -> 3V3
 
 // ================= GAME CONFIG =================
 const uint32_t GAME_SECONDS = 150;   // 2:30
@@ -46,6 +49,73 @@ const int MAX_STRIKES       = 3;
 const int JACK_CLOSED = LOW;
 
 const int JACK_PINS[4] = { PIN_JACK1, PIN_JACK2, PIN_JACK3, PIN_JACK4 };
+
+// ================= JACK SENSING =================
+// A banana wire is a plain short: red plug = signal, black plug = GND.
+//   wire in  -> GPIO pulled to GND -> LOW
+//   wire out -> nothing holds it   -> internal pull-up -> HIGH
+// The pin is never driven by the ESP32, it only reads. A dead short to GND
+// through the internal ~45k pull-up is about 0.07 mA, so it cannot damage it.
+//
+// Contacts bounce for a few ms when a plug is pushed in or pulled out, and a
+// blindfolded player may grab two wires at once. So every pin is debounced
+// (30 ms) here and nowhere else in the code.
+const uint32_t DEBOUNCE_MS = 30;
+
+struct JackState {
+  bool     plugged;    // debounced: true = wire is in
+  bool     raw;        // last raw sample
+  uint32_t changedMs;  // when raw last moved
+  bool     cutEvent;   // latched: a wire was pulled, not handled yet
+};
+
+JackState jacks[4];
+
+void jacksBegin() {
+  for (int i = 0; i < 4; i++) {
+    pinMode(JACK_PINS[i], INPUT_PULLUP);
+    jacks[i].plugged   = true;          // assume all wires are in at power-on
+    jacks[i].raw       = true;
+    jacks[i].changedMs = millis();
+    jacks[i].cutEvent  = false;
+  }
+}
+
+void jacksPoll() {
+  uint32_t now = millis();
+  for (int i = 0; i < 4; i++) {
+    bool raw = (digitalRead(JACK_PINS[i]) == JACK_CLOSED);
+    if (raw != jacks[i].raw) {
+      jacks[i].raw       = raw;
+      jacks[i].changedMs = now;
+    }
+    // only accept the new value once it has been stable for DEBOUNCE_MS
+    if (jacks[i].plugged != jacks[i].raw &&
+        (now - jacks[i].changedMs) >= DEBOUNCE_MS) {
+      jacks[i].plugged = jacks[i].raw;
+      if (!jacks[i].plugged) jacks[i].cutEvent = true;   // in -> out = a cut
+    }
+  }
+}
+
+bool allPlugged() {
+  for (int i = 0; i < 4; i++) {
+    if (!jacks[i].plugged) return false;
+  }
+  return true;
+}
+
+// Returns the first unhandled cut, or -1. The event is consumed either way,
+// so a cut made while the board is not armed can never score later.
+int takeCut() {
+  for (int i = 0; i < 4; i++) {
+    if (jacks[i].cutEvent) {
+      jacks[i].cutEvent = false;
+      return i;
+    }
+  }
+  return -1;
+}
 
 const char* COLOR_NAME[3] = { "RED", "GREEN", "BLUE" };
 const uint8_t COLOR_RGB[3][3] = {
@@ -73,7 +143,6 @@ int  wireCount = 3;
 int  colorIdx  = 0;      // 0 RED, 1 GREEN, 2 BLUE
 int  targetWire = 0;
 bool armed = false;      // true when all wires are plugged in again
-int  lastJack[4] = { LOW, LOW, LOW, LOW };
 
 // what is currently on screen (so we only redraw what changed)
 long lastShownSec     = -1;
@@ -148,9 +217,8 @@ void setLamp(int idx) {
 
 void updateSocketLeds() {
   for (int i = 0; i < 4; i++) {
-    bool plugged = (digitalRead(JACK_PINS[i]) == JACK_CLOSED);
-    bool used    = (i < wireCount);
-    digitalWrite(SOCK_PINS[i], (plugged && used) ? HIGH : LOW);
+    bool used = (i < wireCount);
+    digitalWrite(SOCK_PINS[i], (jacks[i].plugged && used) ? HIGH : LOW);
   }
 }
 
@@ -263,17 +331,6 @@ void drawEnd(const char* big, const char* small, uint16_t col) {
 }
 
 // ================= GAME LOGIC =================
-int readJack(int i) {
-  return digitalRead(JACK_PINS[i]);
-}
-
-bool allPlugged() {
-  for (int i = 0; i < 4; i++) {
-    if (readJack(i) != JACK_CLOSED) return false;
-  }
-  return true;
-}
-
 void newRound() {
   wireCount  = (random(2) == 0) ? 3 : 4;
   colorIdx   = random(3);
@@ -365,7 +422,7 @@ void setup() {
   Serial.begin(115200);
 
   pinMode(PIN_START, INPUT_PULLUP);
-  for (int i = 0; i < 4; i++) pinMode(JACK_PINS[i], INPUT_PULLUP);
+  jacksBegin();
 
   tft.init();
   tft.setRotation(1);           // 320x240 landscape
@@ -376,8 +433,6 @@ void setup() {
   buzzerInit();
 
   randomSeed(micros());
-
-  for (int i = 0; i < 4; i++) lastJack[i] = readJack(i);
 
   state = IDLE;
   drawIdle();
@@ -390,28 +445,17 @@ void loop() {
     updateTimer();
     if (state != RUNNING) return;
 
-    bool jackChanged = false;
-    for (int i = 0; i < 4; i++) {
-      int v = readJack(i);
-      if (v != lastJack[i]) jackChanged = true;
-      lastJack[i] = v;
-    }
+    jacksPoll();
+    updateSocketLeds();
 
     if (!armed && allPlugged()) {
       armed = true;
       drawStatus();
     }
 
-    if (jackChanged) {
-      updateSocketLeds();
-      for (int i = 0; i < 4; i++) {
-        int v = readJack(i);
-        bool nowCut = (v != JACK_CLOSED);
-        if (armed && nowCut && i < wireCount) {
-          handleCut(i);
-          break;
-        }
-      }
+    int cut = takeCut();
+    if (cut >= 0 && armed && cut < wireCount) {
+      handleCut(cut);
     }
 
     if (state == RUNNING) {
