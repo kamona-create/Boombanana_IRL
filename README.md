@@ -70,7 +70,7 @@ whole game.
 | JST-XH connectors | — | modules plug in, nothing is soldered to the case |
 
 Full bill of materials with prices and purchase links:
-**[`BOM.csv`](BOM.csv)** — total **$152.87** including tools.
+**[`BOM.csv`](BOM.csv)** — total **$160.87** including tools.
 
 Every dimension, hole and tolerance:
 **[`hardware/MECHANICAL.md`](hardware/MECHANICAL.md)**.

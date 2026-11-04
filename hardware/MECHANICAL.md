@@ -192,7 +192,7 @@ Notes:
   the 1.2 mm top rim.
 - Every lug needs a R1.5 fillet at its base or it will snap off when the screw
   is tightened.
-- The lid is opened every time you swap the power bank, so it gets inserts, not
+- The lid is opened whenever you service the wiring, so it gets inserts, not
   self-tapping threads.
 
 ## 3. Part dimensions (what you are fitting inside)
@@ -207,26 +207,26 @@ Notes:
 | ~~Push button 12 mm (start)~~ | **not in `BOM.csv` yet** — the firmware uses `PIN_START` 33 | needs a part before the panel can be cut |
 | 5 mm LED (1x RGB + 4x green) | body Ø5.0, height 6.0, legs on 2.54 pitch | press-fit into a Ø5.1 hole |
 | Passive buzzer module 5V | ~20 x 15 x 8 (the BOM part is the 3-pin PCB type) | 2x M2, or a printed ring |
-| Perfboard **8 x 12 cm** | 120.0 x 80.0 x 1.6, holes Ø1.0 on 2.54 pitch | 4x M3 holes at the corners, standoffs 6 mm |
+| Perfboard **8 x 12 cm** | 120.0 x 80.0 x 1.6, holes Ø1.0 on 2.54 pitch | 4x M3 holes at the corners, standoffs 16 mm (clears the jack tails) |
 | JST-XH 2-pin | 2.50 pitch, housing ~7.4 x 4.5 | free-hanging (cable), no case feature |
-| Power bank 5000 mAh | ~90 x 62 x 12 (varies!) | Velcro or a printed strap — do not model it as a tight pocket |
+| Power bank 5000 mAh | ~90 x 62 x 12 (varies!) | **external** — powers the case through the USB-C panel connector; no case feature |
 | USB-C plug shell | 8.4 x 2.6 | opening 9.0 x 4.0 with 1 mm chamfer on the outside |
 
 Add **2 mm** of clearance around every part that is not screwed down
-(glass edges, buzzer, power bank strap).
+(glass edges, buzzer).
 
 ## 4. Cutout table (all holes in the case)
 
 | # | Cutout | Size | Qty | Panel | Notes |
 |---|---|---|---|---|---|
-| 1 | Banana jack | Ø8.2 | 8 | front | 2 rows of 4, 20 mm between centres, ≥18 mm of flat around each |
+| 1 | Banana jack | Ø8.2 | 8 | front | 2 rows of 4. The cap is **Ø17**, so ≥20 mm between centres (the old model used 25.40 — one inch) |
 | 2 | Screen window | 48.9 x 36.7 | 1 | front | centre it; allow 4 mm of bezel overlap on each side so the glass is covered |
 | 3 | Screen screw bosses | Ø2.5 | 4 | front (inside) | bosses Ø5.0, height = 2.5 (module thickness) |
 | 4 | Start button | Ø12.2 | 1 | front | **blocked: no part in the BOM** — pick one first |
 | 5 | Toggle switches | Ø6.2 + 1.5 keyway | 4 | front | MTS-203 mini toggle; 25 mm between centres. Swap to Ø12.2 only if you buy full-size M12 toggles |
 | 6 | LED holes (1 RGB + 4 green) | Ø5.1 | 5 | front | 1 big lamp + 4 socket indicators; leave 1.2 mm between LED holes |
 | 7 | Buzzer grille | Ø2.0 | 6 | front | drill pattern instead of one big hole, keeps dust out |
-| 8 | USB port | 9.0 x 4.0 | 1 | right side | 25 mm from the front face so the cable doesn't foul the table |
+| 8 | USB-C panel connector | per the part (Ø12 round or 9x4 square) | 1 | right side | power bank is external; measure the connector before cutting. 25 mm from the front face so the cable doesn't foul the table |
 | 9 | Reset/BOOT access | Ø3.0 | 2 | back | so you can reflash without opening the case |
 | 10 | Module JST pass-through | Ø8.0 | 2 | internal wall | cable path between the two module areas |
 
@@ -287,13 +287,13 @@ own nut. The table below says which is which.
 |---|---|---|---|
 | Screen | 4 bosses + M2.5 screws | boss OD Ø5.0, height 2.5, pilot Ø2.1 | it is the front face — a loose screen kills the product |
 | ESP32 | printed cradle (3 walls) + 1 snap tab | wall 1.6 thick, 3.0 tall, board clearance +0.3 per side, tab 3.0 long x 1.2 thick | DevKit V1 has no trustworthy mounting holes |
-| Perfboard | 4 standoffs + M3 self-tap | standoff OD Ø6.0, height 6.0, pilot Ø2.5 | keeps solder joints off the floor of the case |
+| Perfboard | 4 standoffs + M3 self-tap | standoff OD Ø6.0, height **16.0**, pilot Ø2.5 | 6.0 was wrong — jack tails reach 15.6 mm behind the panel; see `MOUNTS.md` §5 |
 | Banana jack | the part's own nut | hole Ø8.2, washer behind | the hole *is* the mount |
-| Toggle switch | own nut + anti-rotation flat | hole Ø12.2 + 1.5 wide keyway slot | M12 switches spin if you don't key them |
+| Toggle switch | own nut + anti-rotation flat | hole Ø6.2 + 1.5 wide keyway slot | MTS-203 mini. A nut alone lets it spin — key it |
 | Start button | own nut | hole Ø12.2 | same |
 | 5 mm LEDs (5) | press-fit + 0.6 mm retention lip | hole Ø5.1, lip on the inside | glue alone pops out with heat |
 | Buzzer | two-piece ring, 2x M2 | ring OD Ø18, ID Ø12.2, ears with Ø2.2 | needs to be serviceable, not glued |
-| Power bank | strap slots for velcro | slot 3.2 x 1.6, **do not** model a tight pocket | power bank sizes vary by ±5 mm |
+| USB-C panel connector | bulkhead nut through the right wall | cutout per the part you buy (Ø12 round or 9x4 square), 1.0x45° chamfer outside | power bank is external — see `MOUNTS.md` §7 |
 | Wiring | 3x cable clips or zip-tie slots | clip gap 0.8 for 22 AWG, slot 3.2 x 1.6 | so pulling a cable never loads a solder joint |
 
 Rules that keep mounts from breaking:
@@ -308,8 +308,7 @@ Rules that keep mounts from breaking:
 ## 9. What NOT to do
 
 - ❌ Double-sided tape as the primary attachment (reviewers reject "held by tape").
-- ❌ Glue for anything you might need to replace (buzzer, power bank, screen).
-- ❌ A tight pocket for the power bank — you will change power banks.
+- ❌ Glue for anything you might need to replace (buzzer, screen).
 - ❌ Mounts that block the USB port or the BOOT button.
 - ❌ Screwing into a 3 mm wall without a boss.
 
