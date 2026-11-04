@@ -393,3 +393,37 @@
 - الجدران غير متماثلة: يسار 5.53، يمين 6.24، أسفل 4.23، أعلى 3.65.
 - حافة الفم عند الأعلى **1.2mm فقط** - أرق نقطة في الكيس.
 - `case_cover_v0_stub.stl` = 12 مثلث، ماهو غطاء. احذفه بعد ما تعمل الغطاء.
+
+---
+
+## مراجع تعلّم Onshape (كلها متحقَّق منها)
+
+| # | الفيديو | اللغة | يخدمك في |
+|---|---|---|---|
+| 1 | [تعلم التصميم والطباعة ثلاثية الأبعاد في نصف ساعة](https://www.youtube.com/watch?v=AuTeQVlug2c) | عربي | الأساسيات - جزء Onshape يبدأ من **02:00** |
+| 2 | [Onshape CAD for 3D Printing Tutorial](https://www.youtube.com/watch?v=kj-oZgmRB2w) | إنجليزي | علبة لـ PCB - الأقرب لمشكلتك |
+| 3 | [How to Design a Case for (KiCad) PCB in Onshape](https://www.youtube.com/watch?v=7FC-pByCCXM) | إنجليزي | كيس + بورد، نفس الستاك |
+| 4 | [Onshape Tutorial - Holes](https://www.youtube.com/watch?v=HYa4Le9DuL8) | إنجليزي | counterbore حق اللّقات والغطاء |
+| 5 | [Top 3D Printing Tips and Tricks for Onshape](https://www.youtube.com/watch?v=0JcB-6s1u70) | إنجليزي | draft، tolerances، قابلية الطباعة |
+| 6 | [Onshape Tutorial for Beginners](https://www.youtube.com/watch?v=9Iyy7VdZ_2k) | إنجليزي | لو بدأت من صفر |
+
+**مراجع مكتوبة (أسرع من الفيديو للقواعد):**
+
+- [Onshape - Hole tool](https://cad.onshape.com/help/Content/PartStudio/hole.htm)
+- [Onshape - Linear Pattern](https://cad.onshape.com/help/Content/PartStudio/linear_pattern.htm)
+- [How to design bosses for heat-set inserts](https://insertguide.com/guides/guides-how-to-design-bosses-for-heat-set-inserts/)
+
+> **تحذير مهم:** الدرس اللي تتعلمه من الفيديو = **تقنية** (كيف تستخدم
+> Sketch/Extrude/Fillet). هذا مسموح. اللي ممنوع = تنسخ موديل جاهز وتقدّمه
+> كأنه تصميمك. تعلّم الأداة، ارسم قطعك انت.
+
+### الفرق بينك وبين كل الشروحات
+
+كل الفيديوهات تبدأ من **صندوق فاضي** وتبني عليه. انت تبدأ من **جسم موجود**
+(الحوض) وتضيف عليه. الفرق العملي:
+
+1. Sketch على **الوجه الداخلي** الموجود، مو على plane جديد.
+2. **Extrude > Add** (مو New) - عشان يلتحم مع الجسم.
+3. الاتجاه **+Y للداخل** (لأن الفم عند Y = -60.96).
+4. Fillet بعد كل إضافة، مو في الآخر - وإلا الـfillet يفشل على زوايا معقّدة.
+
