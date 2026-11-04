@@ -1,13 +1,16 @@
 /*
  * BOMBANANA IRL - v1 firmware
- * Modules: CABLE (4 banana jacks) + SWITCH panel + timer + strikes + buzzer
+ * Modules: CABLE (4 banana jacks) + SWITCH (4 toggles) + timer + strikes + buzzer
  *
  * Roles are human: blind (touch), deaf (sight), mute (reads the manual).
  * This firmware only handles the electronics.
  *
  * Display : 2.4" ILI9341 SPI, 320x240 landscape (no touch)
- * LEDs    : 1x RGB LED (the big "lamp") + 4x green LEDs (socket indicators)
+ * LEDs    : 1x RGB LED (the big "lamp") + 4x green LEDs (socket indicators,
+ *           reused as per-switch feedback during a switch round)
  *           only the lamp needs colour, so no addressable LEDs and no extra library
+ *
+ * Round plan: 5 rounds, 2 of them switch rounds, shuffled each game.
  */
 
 #include <Arduino.h>
@@ -35,13 +38,30 @@
 #define PIN_SOCK3   22
 #define PIN_SOCK4   12
 
+// Switch module: 4x MTS-203 toggle, one pole each, wired as a plain SPST to GND.
+// 34 / 35 / 36 / 39 are the only free pins left, but they are INPUT-ONLY and
+// have NO internal pull-up. Each one therefore needs an external 10k to 3V3
+// on the perfboard. Without that resistor the pin floats and reads garbage.
+//   switch open  -> pulled to 3V3 -> HIGH -> "UP"
+//   switch closed-> shorted to GND -> LOW  -> "DOWN"
+#define PIN_SW1     34
+#define PIN_SW2     35
+#define PIN_SW3     36
+#define PIN_SW4     39
+
 // TFT (set in platformio.ini build_flags):
 //   MOSI 23 | MISO 19 | SCK 18 | CS 5 | DC 2 | RST -> 3V3 | BL -> 3V3
 
 // ================= GAME CONFIG =================
 const uint32_t GAME_SECONDS = 150;   // 2:30
-const int TOTAL_ROUNDS      = 5;     // defuse 5 cables to win
+const int TOTAL_ROUNDS      = 5;     // 5 modules to clear to win
+const int SWITCH_ROUNDS     = 2;     // of the 5, this many are switch rounds
 const int MAX_STRIKES       = 3;
+
+// A switch round is cleared once all four switches sit on the target pattern
+// and stay there for this long. The hold stops a switch that is mid-throw
+// (contacts still bouncing) from counting as a match.
+const uint32_t SWITCH_HOLD_MS = 500;
 
 // A jack pair is wired to GND, so:
 //   LOW  = wire still plugged in (intact)
@@ -117,6 +137,40 @@ int takeCut() {
   return -1;
 }
 
+// ================= SWITCH SENSING =================
+// Same debounce as the jacks, but there is no edge event to latch: a toggle
+// only matters while the round is being checked, so we just keep the stable
+// level. Bit i of swState is 1 when switch i is UP.
+const int SWITCH_PINS[4] = { PIN_SW1, PIN_SW2, PIN_SW3, PIN_SW4 };
+
+uint8_t  swState      = 0;     // debounced, bit 1 = UP
+uint8_t  swLastRaw    = 0;     // last raw sample
+uint32_t swChangedMs  = 0;     // when the raw sample last moved
+
+void switchesBegin() {
+  for (int i = 0; i < 4; i++) {
+    pinMode(SWITCH_PINS[i], INPUT);   // no INPUT_PULLUP - pin has no pull-up
+    if (digitalRead(SWITCH_PINS[i]) == HIGH) swState |= (1 << i);
+  }
+  swLastRaw   = swState;
+  swChangedMs = millis();
+}
+
+void switchesPoll() {
+  uint32_t now = millis();
+  uint8_t  raw = 0;
+  for (int i = 0; i < 4; i++) {
+    if (digitalRead(SWITCH_PINS[i]) == HIGH) raw |= (1 << i);
+  }
+  if (raw != swLastRaw) {
+    swLastRaw   = raw;
+    swChangedMs = now;
+  }
+  if (raw != swState && (now - swChangedMs) >= DEBOUNCE_MS) {
+    swState = raw;
+  }
+}
+
 const char* COLOR_NAME[3] = { "RED", "GREEN", "BLUE" };
 const uint8_t COLOR_RGB[3][3] = {
   { 255,   0,   0 },
@@ -136,6 +190,10 @@ const int SOCK_PINS[4] = { PIN_SOCK1, PIN_SOCK2, PIN_SOCK3, PIN_SOCK4 };
 enum State { IDLE, RUNNING, BOOM, WIN };
 State state = IDLE;
 
+enum RoundType { RND_CABLE, RND_SWITCH };
+RoundType roundPlan[TOTAL_ROUNDS];
+bool      roundIsSwitch = false;
+
 uint32_t startMs = 0;
 int  strikes   = 0;
 int  roundNo   = 0;      // 0..TOTAL_ROUNDS-1
@@ -144,6 +202,10 @@ int  colorIdx  = 0;      // 0 RED, 1 GREEN, 2 BLUE
 int  targetWire = 0;
 bool armed = false;      // true when all wires are plugged in again
 
+uint8_t  swTarget   = 0;     // 4-bit pattern the player must reach
+bool     swHolding  = false; // we are inside the SWITCH_HOLD_MS window
+uint32_t swHoldStart = 0;
+
 // what is currently on screen (so we only redraw what changed)
 long lastShownSec     = -1;
 int  lastShownStrikes = -1;
@@ -151,6 +213,7 @@ int  lastShownRound   = -1;
 int  lastShownWires   = -1;
 bool lastShownArmed   = false;
 int  lastShownColor   = -1;
+int  lastShownSw      = -1;
 
 // ================= BUZZER =================
 void buzzerInit() {
@@ -220,6 +283,22 @@ void updateSocketLeds() {
     bool used = (i < wireCount);
     digitalWrite(SOCK_PINS[i], (jacks[i].plugged && used) ? HIGH : LOW);
   }
+}
+
+// During a switch round the same four green LEDs become per-switch feedback:
+// a lit LED means that switch is already on its target position. The blind
+// player cannot use it, but the sighted one can call the remaining ones out.
+void updateSwitchLeds() {
+  for (int i = 0; i < 4; i++) {
+    bool ok = (bitRead(swState, i) == bitRead(swTarget, i));
+    digitalWrite(SOCK_PINS[i], ok ? HIGH : LOW);
+  }
+}
+
+void lampOff() {
+  digitalWrite(PIN_LAMP_R, LOW);
+  digitalWrite(PIN_LAMP_G, LOW);
+  digitalWrite(PIN_LAMP_B, LOW);
 }
 
 void ledsOff() {
@@ -316,6 +395,55 @@ void drawStatus() {
   lastShownColor   = colorIdx;
 }
 
+// Switch rounds show four UP/DN cells instead of the colour block. The boxes
+// are drawn in green when that switch already matches, orange when it does
+// not, so the sighted player can read the progress without reading numbers.
+void drawSwitchStatus() {
+  tft.setTextDatum(TL_DATUM);
+  tft.setTextColor(TFT_DARKGREY, TFT_BLACK);
+  tft.drawString("BOMBANANA IRL", 8, 8, 2);
+
+  char st[8];
+  for (int i = 0; i < MAX_STRIKES; i++) st[i] = (i < strikes) ? 'X' : '-';
+  st[MAX_STRIKES] = 0;
+  tft.setTextDatum(TR_DATUM);
+  tft.setTextColor(strikes ? TFT_RED : TFT_DARKGREY, TFT_BLACK);
+  tft.drawString(st, 312, 8, 2);
+
+  tft.setTextDatum(TL_DATUM);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  char row1[24];
+  snprintf(row1, sizeof(row1), "SWITCH %d/%d", roundNo + 1, TOTAL_ROUNDS);
+  tft.fillRect(0, 152, 190, 26, TFT_BLACK);
+  tft.drawString(row1, 8, 155, 2);
+
+  int matched = 0;
+  for (int i = 0; i < 4; i++) {
+    if (bitRead(swState, i) == bitRead(swTarget, i)) matched++;
+  }
+  char row2[24];
+  snprintf(row2, sizeof(row2), "MATCH %d/4", matched);
+  tft.setTextDatum(TR_DATUM);
+  tft.setTextColor(matched == 4 ? TFT_GREEN : TFT_YELLOW, TFT_BLACK);
+  tft.fillRect(190, 152, 122, 26, TFT_BLACK);
+  tft.drawString(row2, 312, 155, 2);
+
+  for (int i = 0; i < 4; i++) {
+    int  x  = 8 + i * 78;
+    bool up = bitRead(swState, i);
+    uint16_t c = (up == bitRead(swTarget, i)) ? TFT_GREEN : TFT_ORANGE;
+    tft.fillRect(x, 183, 70, 46, TFT_BLACK);
+    tft.drawRect(x, 183, 70, 46, c);
+    tft.setTextDatum(MC_DATUM);
+    tft.setTextColor(c, TFT_BLACK);
+    tft.drawString(up ? "UP" : "DN", x + 35, 206, 4);
+  }
+
+  lastShownStrikes = strikes;
+  lastShownRound   = roundNo;
+  lastShownSw      = swState;
+}
+
 void drawEnd(const char* big, const char* small, uint16_t col) {
   tft.fillScreen(TFT_BLACK);
   tft.setTextDatum(MC_DATUM);
@@ -331,7 +459,22 @@ void drawEnd(const char* big, const char* small, uint16_t col) {
 }
 
 // ================= GAME LOGIC =================
-void newRound() {
+// The 5 rounds are not all cables: SWITCH_ROUNDS of them are switch modules.
+// The plan is built once per game and then shuffled, so the order cannot be
+// memorised between plays.
+void buildRoundPlan() {
+  for (int i = 0; i < TOTAL_ROUNDS; i++) {
+    roundPlan[i] = (i < SWITCH_ROUNDS) ? RND_SWITCH : RND_CABLE;
+  }
+  for (int i = TOTAL_ROUNDS - 1; i > 0; i--) {
+    int j = random(i + 1);
+    RoundType t  = roundPlan[i];
+    roundPlan[i] = roundPlan[j];
+    roundPlan[j] = t;
+  }
+}
+
+void newCableRound() {
   wireCount  = (random(2) == 0) ? 3 : 4;
   colorIdx   = random(3);
   targetWire = (wireCount == 3) ? TABLE_3[colorIdx] : TABLE_4[colorIdx];
@@ -340,14 +483,39 @@ void newRound() {
   setLamp(colorIdx);
 }
 
+// random(1, 16) never gives 0 (all down), and 15 (all up) is rejected too:
+// both are solved by throwing every switch the same way without reading
+// anything, which is not a puzzle.
+void newSwitchRound() {
+  do { swTarget = (uint8_t)random(1, 16); } while (swTarget == 15);
+  armed     = false;
+  swHolding = false;
+  lampOff();
+  updateSwitchLeds();
+}
+
+void nextRound() {
+  roundIsSwitch = (roundPlan[roundNo] == RND_SWITCH);
+  // Both layouts share rows 152..240 but draw different things there, so wipe
+  // the whole band. The timer lives above it and keeps counting untouched.
+  tft.fillRect(0, 152, 320, 88, TFT_BLACK);
+  if (roundIsSwitch) {
+    newSwitchRound();
+    drawSwitchStatus();
+  } else {
+    newCableRound();
+    drawStatus();
+  }
+}
+
 void startGame() {
   strikes = 0;
   roundNo = 0;
   startMs = millis();
   state = RUNNING;
   tft.fillScreen(TFT_BLACK);
-  newRound();
-  drawStatus();
+  buildRoundPlan();
+  nextRound();
   soundStart();
 }
 
@@ -373,7 +541,7 @@ void handleCut(int idx) {
       return;
     }
     soundGood();
-    newRound();
+    nextRound();
   } else {
     strikes++;
     soundStrike();
@@ -381,7 +549,41 @@ void handleCut(int idx) {
       gameOver();
       return;
     }
-    newRound();
+    nextRound();
+  }
+}
+
+// Called every loop while a switch round is running. A switch thrown on a dark
+// game is silent and weightless, so the only feedback is the screen and the
+// four green LEDs. Nothing here can strike the player: time is the pressure.
+void handleSwitchRound() {
+  uint32_t now = millis();
+
+  if (swState == swTarget) {
+    if (!swHolding) {
+      swHolding   = true;
+      swHoldStart = now;
+    } else if (now - swHoldStart >= SWITCH_HOLD_MS) {
+      swHolding = false;
+      roundNo++;
+      if (roundNo >= TOTAL_ROUNDS) {
+        gameWin();
+        return;
+      }
+      soundGood();
+      nextRound();
+      return;
+    }
+  } else {
+    swHolding = false;
+  }
+
+  updateSwitchLeds();
+
+  if (swState != lastShownSw ||
+      strikes != lastShownStrikes ||
+      roundNo != lastShownRound) {
+    drawSwitchStatus();
   }
 }
 
@@ -423,6 +625,7 @@ void setup() {
 
   pinMode(PIN_START, INPUT_PULLUP);
   jacksBegin();
+  switchesBegin();
 
   tft.init();
   tft.setRotation(1);           // 320x240 landscape
@@ -440,31 +643,39 @@ void setup() {
 
 void loop() {
   handleStartButton();
+  if (state != RUNNING) return;
 
-  if (state == RUNNING) {
-    updateTimer();
-    if (state != RUNNING) return;
+  updateTimer();
+  if (state != RUNNING) return;
 
-    jacksPoll();
-    updateSocketLeds();
+  jacksPoll();
+  switchesPoll();
 
-    if (!armed && allPlugged()) {
-      armed = true;
-      drawStatus();
-    }
+  // ---- switch module ----
+  if (roundIsSwitch) {
+    takeCut();            // drain, so a pulled wire cannot score later
+    handleSwitchRound();
+    return;
+  }
 
-    int cut = takeCut();
-    if (cut >= 0 && armed && cut < wireCount) {
-      handleCut(cut);
-    }
+  // ---- cable module ----
+  updateSocketLeds();
 
-    if (state == RUNNING) {
-      if (strikes  != lastShownStrikes ||
-          roundNo  != lastShownRound   ||
-          wireCount != lastShownWires  ||
-          colorIdx != lastShownColor) {
-        drawStatus();
-      }
-    }
+  if (!armed && allPlugged()) {
+    armed = true;
+    drawStatus();
+  }
+
+  int cut = takeCut();
+  if (cut >= 0 && armed && cut < wireCount) {
+    handleCut(cut);
+    return;               // nextRound() has already drawn the next round
+  }
+
+  if (strikes   != lastShownStrikes ||
+      roundNo   != lastShownRound   ||
+      wireCount != lastShownWires   ||
+      colorIdx  != lastShownColor) {
+    drawStatus();
   }
 }

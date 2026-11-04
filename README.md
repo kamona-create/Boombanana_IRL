@@ -61,7 +61,7 @@ whole game.
 |---|---|---|
 | ESP32 DevKit V1 (30-pin, USB-C) | 1 | one board runs everything |
 | 2.4" ILI9341 SPI TFT (no touch) | 1 | timer + strikes |
-| Banana jack JS-910B | 8 | 4 pairs, panel hole Ø8.0 |
+| Banana jack JS-910B | 8 | 4 pairs, panel hole Ø8.2 (part is Ø8.0, print clearance)|
 | 4 mm banana plug | 8 | one per pullable wire |
 | MTS-203 mini toggle | 4 | switch module |
 | 5 mm LED | 5 | 1 common-cathode RGB + 4 green |
@@ -70,7 +70,7 @@ whole game.
 | JST-XH connectors | — | modules plug in, nothing is soldered to the case |
 
 Full bill of materials with prices and purchase links:
-**[`BOM.csv`](BOM.csv)** — total **$160.87** including tools.
+**[`BOM.csv`](BOM.csv)** — total **$161.40** including tools.
 
 Every dimension, hole and tolerance:
 **[`hardware/MECHANICAL.md`](hardware/MECHANICAL.md)**.
@@ -80,6 +80,7 @@ Every dimension, hole and tolerance:
 | Signal | GPIO |
 |---|---|
 | Jack 1 / 2 / 3 / 4 | 13 / 14 / 16 / 17 |
+| Switch 1 / 2 / 3 / 4 | 34 / 35 / 36 / 39 |
 | Socket indicator LEDs ×4 | 4 / 21 / 22 / 12 |
 | RGB lamp R / G / B | 25 / 26 / 27 |
 | Buzzer | 32 |
