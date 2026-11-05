@@ -28,4 +28,5 @@ Parts list with live prices: [BOM.csv](BOM.csv)
 # November 4: case adjustment and :
 I made some adjustment in my CAD so i can insert the components , also tried to build a schematic but im bad at designing circuts so i deleted the idea, also i made some changes on my code , Wish me good luck🙏🙏.
 
+![case design modfication ](casemodificaton)
 **Total time spent: 4h**
