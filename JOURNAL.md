@@ -25,16 +25,23 @@ Parts list with live prices: [BOM.csv](BOM.csv)
 
 **Total time spent: 5h**
 
-# November 4: case adjustment and :
+# November 4: case adjustment  :
 I made some adjustment in my CAD so i can insert the components , also tried to build a schematic but im bad at designing circuts so i deleted the idea, also i made some changes on my code , Wish me good luck🙏🙏.
 
 ![case design modfication ](casemodificaton)
 
 **Total time spent: 4h**
 
-# November 5: case adjustment and :
+# November 5: case adjustment again:
 Today also I made some adjustment in my CAD so i can insert the components , I didn't make a lot of work today but i was planning for the next week.
 
 ![case design modfication ](casemodificaton)
 
-**Total time spent: 1h**
+**Total time spent: 1h** 
+
+# November 7: case adjustment and cover check :
+Today also I made some adjustment in my CAD so i can insert the components ,I took a rest yesterday and i made a room for the components.
+
+![case design modfication ](casemodificaton)
+
+**Total time spent: 1h 3m**
