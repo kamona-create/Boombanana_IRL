@@ -31,3 +31,10 @@ I made some adjustment in my CAD so i can insert the components , also tried to 
 ![case design modfication ](casemodificaton)
 
 **Total time spent: 4h**
+
+# November 5: case adjustment and :
+Today also I made some adjustment in my CAD so i can insert the components , I didn't make a lot of work today but i was planning for the next week.
+
+![case design modfication ](casemodificaton)
+
+**Total time spent: 1h**
