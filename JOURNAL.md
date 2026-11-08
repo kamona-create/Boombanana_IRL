@@ -45,3 +45,12 @@ Today also I made some adjustment in my CAD so i can insert the components ,I to
 ![case design modfication ](casemodificaton)
 
 **Total time spent: 1h 3m**
+
+# November 8: jacks and switches housing :
+I made a housing for the jacks and switches, Also i made the manual for my game , there will be a printable manual in the repo , i wish the reviewers see it .
+
+![Manual printable version](casemodificaton)
+
+![case design modfication ](casemodificaton)
+
+**Total time spent: 1h 23m**
