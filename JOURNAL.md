@@ -51,9 +51,9 @@ I made a housing for the jacks and switches, A dimension modfication for the cov
 
 ![Manual printable version](BOOM-manual)
 
-![jack modefications](holes)
+![jack modefications](holes.png)
 
-![cover modefications](cover)
+![cover modefications](cover.png)
 
 
 **Total time spent: 1h 23m**
