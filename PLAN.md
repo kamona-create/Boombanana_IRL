@@ -181,11 +181,14 @@ Boombanana_IRL/
 ├── PLAN.md
 ├── LICENSE
 ├── build.bat
+├── serve.bat                    ← تشغيل اللعبة على شبكة الواي فاي
 ├── platformio.ini
 ├── src/
 │   └── main.cpp
 ├── sim/
 │   └── index.html               ← المحاكي
+├── tools/
+│   └── serve.ps1                ← سيرفر محلي (يستعمله serve.bat)
 ├── docs/
 │   ├── GAME-GUIDE.md            ← دليل اللاعب (إنجليزي)
 │   ├── QUICK-RULES.md           ← ورقة قواعد عربي

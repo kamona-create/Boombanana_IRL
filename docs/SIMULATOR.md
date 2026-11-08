@@ -7,8 +7,25 @@ only way this firmware can be verified without hardware.
 
 ## Run it
 
-Open `sim/index.html` in any modern browser (double-click is enough — no
-server, no build, no network).
+**Fastest (one PC):** open `sim/index.html` in any modern browser
+(double-click is enough — no server, no build, no network).
+
+**Share it on your Wi-Fi (phones/other laptops):** double-click `serve.bat` in
+the repo root. It starts a Python 3 static server on port 8080 and prints:
+
+```
+This PC   : http://localhost:8080/
+Wi-Fi     : http://192.168.x.x:8080/
+```
+
+Open the **Wi-Fi** address on any device on the same network. Allow the
+Windows firewall prompt on **Private networks** the first time, and keep the
+black window open while people play (Ctrl+C stops it). The script needs
+Python 3 — the PlatformIO one is picked up automatically if `python` is not on
+PATH.
+
+> A LAN link only works while the server runs on your machine. For a permanent
+> public link, GitHub Pages can host `sim/` for free — that is a separate step.
 
 | Control | Action |
 |---|---|

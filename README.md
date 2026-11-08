@@ -16,6 +16,14 @@ the bomb only goes quiet if all three of them work together.
 
 ---
 
+## Play it
+
+Double-click **`sim/index.html`** to play on this PC, or **`serve.bat`** to
+serve the same game on your Wi-Fi (`http://<your-ip>:8080/`) so phones can
+join. Controls and test scenarios: [`docs/SIMULATOR.md`](docs/SIMULATOR.md).
+
+---
+
 ## Scope — what this repo is, and what it is not
 
 This project covers **design and software only**:
@@ -165,6 +173,8 @@ there is no edited `User_Setup.h` to forget about.
 src/main.cpp              firmware — game state machine, display, audio
 platformio.ini            board + TFT_eSPI pin configuration
 build.bat                 Windows build helper (retries on USB drop)
+serve.bat                 serve sim/ on your Wi-Fi so phones can play
+tools/serve.ps1           the server behind serve.bat (Python 3 http.server)
 BOM.csv                   every part, price and link + TOTAL
 hardware/MECHANICAL.md    measured dimensions of final.stl, hole table, gaps
 hardware/MOUNTS.md        mounting reference (Arabic): depth budget, bosses
