@@ -18,9 +18,12 @@ the bomb only goes quiet if all three of them work together.
 
 ## Play it
 
-Double-click **`sim/index.html`** to play on this PC, or **`serve.bat`** to
-serve the same game on your Wi-Fi (`http://<your-ip>:8080/`) so phones can
-join. Controls and test scenarios: [`docs/SIMULATOR.md`](docs/SIMULATOR.md).
+**Online (any device):** **https://kamona-create.github.io/Boombanana_IRL/**
+
+**Offline:** double-click **`sim/index.html`** to play on this PC, or
+**`serve.bat`** to serve the same game on your Wi-Fi (`http://<your-ip>:8080/`)
+so phones can join. Controls and test scenarios:
+[`docs/SIMULATOR.md`](docs/SIMULATOR.md).
 
 ---
 

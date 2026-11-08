@@ -24,8 +24,9 @@ black window open while people play (Ctrl+C stops it). The script needs
 Python 3 — the PlatformIO one is picked up automatically if `python` is not on
 PATH.
 
-> A LAN link only works while the server runs on your machine. For a permanent
-> public link, GitHub Pages can host `sim/` for free — that is a separate step.
+> A LAN link only works while the server runs on your machine. A permanent
+> public link is live at **https://kamona-create.github.io/Boombanana_IRL/**
+> (GitHub Pages, built from `main`).
 
 | Control | Action |
 |---|---|
