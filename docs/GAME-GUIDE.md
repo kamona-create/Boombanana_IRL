@@ -1,6 +1,7 @@
 # BOMBANANA IRL — Game Guide / دليل اللعبة
 
 *A printable, player-facing manual. Keep it on the table next to the console.*
+*النسخة العربية المختصرة: [`QUICK-RULES.md`](QUICK-RULES.md)*
 
 **Credits:** BOMBANANA! — 3-player party game by **Lefto Studio**.
 This physical adaptation for the IRL build is by **Monzer Taher**.
@@ -11,7 +12,7 @@ This physical adaptation for the IRL build is by **Monzer Taher**.
 
 Defuse the console before the timer runs out. **Survive all 5 rounds with fewer than 3 strikes.** That's it. The console is the one place everyone can see what's happening — but each player can only offer one sense to the team.
 
-انقد وحدة التحكم قبل انتهاء الوقت. **اعبر الـ 5 جولات بأقل من 3 ضربات.** لا تشترط خاطئة من أكثر من لاعب — المهم الانضباط.
+فكّك وحدة التحكم قبل انتهاء الوقت. **اعبر الجولات الخمس بأقل من 3 أخطاء.** لا أحد يرى الصورة كاملة — كل لاعب يقدّم حاسة واحدة فقط للفريق.
 
 **Timer:** 2:30 minutes. **Lives:** 3 strikes — on the 3rd, it goes **BOOM!**.
 
@@ -21,7 +22,7 @@ Defuse the console before the timer runs out. **Survive all 5 rounds with fewer 
 
 | Role / الدور | Sense / الحاسة | Job / المهمة |
 |---|---|---|
-| **The Defuser** (blind) — النازع | Touch فقط | Pulls the wires, flips the switches — touch, nothing else |
+| **The Defuser** (blind) — الفكّاك | Touch فقط | Pulls the wires, flips the switches — touch, nothing else |
 | **The Lookout** (deaf) — الشاهد | Sight فقط | Watches the screen + lamp + LEDs, talks? NO — they can't hear, so they call out with hands/notes |
 | **The Analyst** (mute) — المحلل | Reads فقط | Holds this guide, knows exactly which wire to pull from the tables below, tells the team — without speaking |
 
@@ -53,8 +54,8 @@ The console shows:
 
 | Wires | RED | GREEN | BLUE |
 |---|---|---|---|
-| **3 wires** (من واحد إلى 3) | cut the **3rd** wire | cut the **1st** wire | cut the **2nd** wire |
-| **4 wires** (من واحد إلى 4) | cut the **4th** | cut the **3rd** | cut the **2nd** |
+| **3 wires** (3 أسلاك) | cut the **3rd** wire | cut the **1st** wire | cut the **2nd** wire |
+| **4 wires** (4 أسلاك) | cut the **4th** | cut the **3rd** | cut the **2nd** |
 
 3. The Analyst communicates the answer — **without speaking**: finger-count the positions (shows 3 fingers for the 3rd wire), point at the printed number below each socket, write it on paper.
 4. The Defuser, **by touch alone**, pulls out the right wire.
@@ -94,8 +95,8 @@ The console shows:
 
 | # | Round type | Strikes |
 |---|---|---|
-| 1 | Cable *(always one of the two types)* | possible |
-| 2 | Cable or switch *(random order each game)* | possible for cable |
+| 1 | Cable or switch *(random order each game)* | possible for cable |
+| 2 | Cable or switch | possible for cable |
 | 3 | Cable or switch | possible for cable |
 | 4 | Cable or switch | possible for cable |
 | 5 | Cable or switch | possible for cable |

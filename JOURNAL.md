@@ -28,32 +28,32 @@ Parts list with live prices: [BOM.csv](BOM.csv)
 # November 4: case adjustment  :
 I made some adjustment in my CAD so i can insert the components , also tried to build a schematic but im bad at designing circuts so i deleted the idea, also i made some changes on my code , Wish me good luck🙏🙏.
 
-![case design modfication ](casemodificaton)
+![case design modfication ](images/casemodification.png)
 
 **Total time spent: 4h**
 
 # November 5: case adjustment again:
 Today also I made some adjustment in my CAD so i can insert the components , I didn't make a lot of work today but i was planning for the next week.
 
-![case design modfication ](casemodificaton)
+![case design modfication ](images/casemodification.png)
 
 **Total time spent: 1h** 
 
 # November 7: case adjustment and cover check :
 Today also I made some adjustment in my CAD so i can insert the components ,I took a rest yesterday and i made a room for the components.
 
-![case design modfication ](casemodificaton)
+![case design modfication ](images/casemodification.png)
 
 **Total time spent: 1h 3m**
 
 # November 8: jacks and switches housing :
 I made a housing for the jacks and switches, A dimension modfication for the cover, Also i made the manual for my game , there will be a printable manual in the repo , i wish the reviewers see it .
 
-![Manual printable version](BOOM-manual)
+Printable manual: [docs/QUICK-RULES.md](docs/QUICK-RULES.md) (Arabic one-pager) and [docs/GAME-GUIDE.md](docs/GAME-GUIDE.md)
 
-![jack modefications](holes.png)
+![jack modefications](images/holes.png)
 
-![cover modefications](cover.png)
+![cover modefications](images/cover.png)
 
 
 **Total time spent: 1h 23m**

@@ -4,3 +4,6 @@ hardware/Kicad/
 .pio/
 .vscode/
 
+# Local scratch / stale files that do not belong to the project
+diagram.json
+gun.html
